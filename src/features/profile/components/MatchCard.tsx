@@ -1,32 +1,43 @@
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {MatchHistory} from '../types/profile';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { MatchHistory } from '../types/profile';
 
 interface MatchCardProps {
   match: MatchHistory;
   onPress?: () => void;
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({match, onPress}) => {
+const MatchCard: React.FC<MatchCardProps> = ({ match, onPress }) => {
   const isWin = match.result === 'Win';
 
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      style={[styles.container, isWin ? styles.winBorder : styles.lossBorder]}>
+      style={[styles.container, isWin ? styles.winBorder : styles.lossBorder]}
+    >
       <View style={styles.header}>
         <View style={styles.gameInfo}>
           <Heading style={styles.gameName}>{match.game}</Heading>
           <Label style={styles.tournament}>{match.tournament}</Label>
         </View>
-        <View style={[styles.resultBadge, isWin ? styles.winBadge : styles.lossBadge]}>
-          <Label style={[styles.resultText, isWin ? styles.winText : styles.lossText]}>
+        <View
+          style={[
+            styles.resultBadge,
+            isWin ? styles.winBadge : styles.lossBadge,
+          ]}
+        >
+          <Label
+            style={[
+              styles.resultText,
+              isWin ? styles.winText : styles.lossText,
+            ]}
+          >
             {match.result}
           </Label>
         </View>
@@ -47,7 +58,7 @@ const MatchCard: React.FC<MatchCardProps> = ({match, onPress}) => {
           </View>
         )}
       </View>
-      
+
       <View style={styles.footer}>
         <Label style={styles.dateText}>
           {new Date(match.date).toLocaleDateString()}
@@ -94,10 +105,10 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   winBadge: {
-    backgroundColor: 'rgba(0, 200, 83, 0.1)',
+    backgroundColor: Colors.success.transparent.light,
   },
   lossBadge: {
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    backgroundColor: Colors.danger.transparent.medium,
   },
   resultText: {
     fontSize: 12,
@@ -131,7 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+    backgroundColor: Colors.warning.transparent.medium,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: Radius.sm,

@@ -1,11 +1,13 @@
-import {PlayerProfile} from '../types/profile';
+import { PlayerProfile } from '../types/profile';
 
 export const DUMMY_PROFILE: PlayerProfile = {
   id: 'usr_123456',
   fullName: 'Alex Chen',
   username: 'ShadowNinja',
-  avatarUrl: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=256&q=80',
-  coverUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1024&q=80',
+  avatarUrl:
+    'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=256&q=80',
+  coverUrl:
+    'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1024&q=80',
   level: 42,
   isVerified: true,
   country: 'United States',

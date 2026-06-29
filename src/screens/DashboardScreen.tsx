@@ -1,12 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  ListRenderItem,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,10 +7,10 @@ import Animated, {
   withDelay,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useFocusEffect} from '@react-navigation/native';
-import {ROUTES} from '../navigation/routes';
-import {BottomTabScreenPropsType} from '../navigation/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
+import { ROUTES } from '../navigation/routes';
+import { BottomTabScreenPropsType } from '../navigation/types';
 
 import {
   Tournament,
@@ -26,11 +19,7 @@ import {
   HeroBannerData,
 } from '../types';
 
-import {
-  tournamentService,
-  playerService,
-  userService,
-} from '../services';
+import { tournamentService, playerService, userService } from '../services';
 
 import DashboardHeader from '../components/DashboardHeader';
 import HeroBanner from '../components/HeroBanner';
@@ -39,18 +28,18 @@ import TournamentCard from '../components/TournamentCard';
 import UpcomingCard from '../components/UpcomingCard';
 import LeaderboardCard from '../components/LeaderboardCard';
 
-import {Colors} from '../theme/colors';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
+import { Colors } from '../theme/colors';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
 
 type Props = BottomTabScreenPropsType<typeof ROUTES.HOME_TAB>;
 
 const tournamentKeyExtractor = (item: Tournament) => item.id;
 const CARD_LAYOUT_WIDTH = wp(178) + Spacing.md; // CARD_WIDTH + marginRight
 
-const DashboardScreen: React.FC<Props> = ({navigation}) => {
+const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  
+
   // Data State
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -98,8 +87,8 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
   useFocusEffect(
     useCallback(() => {
       if (!loading) {
-        opacity.value = withDelay(100, withTiming(1, {duration: 500}));
-        translateY.value = withDelay(100, withTiming(0, {duration: 500}));
+        opacity.value = withDelay(100, withTiming(1, { duration: 500 }));
+        translateY.value = withDelay(100, withTiming(0, { duration: 500 }));
       }
       return () => {
         opacity.value = 0;
@@ -110,11 +99,11 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
 
   const fadeStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{translateY: translateY.value}],
+    transform: [{ translateY: translateY.value }],
   }));
 
   const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
+    onScroll: event => {
       scrollY.value = event.contentOffset.y;
     },
   });
@@ -125,23 +114,31 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
 
   const handleTournamentPress = useCallback(
     (id: string) => {
-      navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {tournamentId: id});
+      navigation.navigate(ROUTES.TOURNAMENT_DETAILS, { tournamentId: id });
     },
     [navigation],
   );
 
   const renderTournamentCard: ListRenderItem<Tournament> = useCallback(
-    ({item, index}) => (
-      <TournamentCard item={item} index={index} onPress={() => handleTournamentPress(item.id)} />
+    ({ item, index }) => (
+      <TournamentCard
+        item={item}
+        index={index}
+        onPress={() => handleTournamentPress(item.id)}
+      />
     ),
-    [handleTournamentPress]
+    [handleTournamentPress],
   );
 
   const renderUpcomingCard: ListRenderItem<Tournament> = useCallback(
-    ({item, index}) => (
-      <UpcomingCard item={item} index={index} onPress={() => handleTournamentPress(item.id)} />
+    ({ item, index }) => (
+      <UpcomingCard
+        item={item}
+        index={index}
+        onPress={() => handleTournamentPress(item.id)}
+      />
     ),
-    [handleTournamentPress]
+    [handleTournamentPress],
   );
 
   const renderLeaderboardCards = useMemo(() => {
@@ -150,11 +147,14 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
     ));
   }, [leaderboard]);
 
-  const getItemLayout = useCallback((data: any, index: number) => ({
-    length: CARD_LAYOUT_WIDTH,
-    offset: CARD_LAYOUT_WIDTH * index,
-    index,
-  }), []);
+  const getItemLayout = useCallback(
+    (data: any, index: number) => ({
+      length: CARD_LAYOUT_WIDTH,
+      offset: CARD_LAYOUT_WIDTH * index,
+      index,
+    }),
+    [],
+  );
 
   if (loading || !profile || !hero) {
     return (
@@ -182,13 +182,16 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
 
       <Animated.ScrollView
         style={[styles.scrollView, fadeStyle]}
-        contentContainerStyle={[styles.scrollContent, {paddingTop: insets.top + 90}]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 90 },
+        ]}
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
         onScroll={scrollHandler}
-        scrollEventThrottle={16}>
-
+        scrollEventThrottle={16}
+      >
         <HeroBanner
           gameName={hero.gameName}
           tournamentName={hero.tournamentName}
@@ -203,19 +206,14 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
             title="Ongoing Tournaments"
             onSeeAll={() => navigation.navigate(ROUTES.TOURNAMENTS_TAB)}
           />
-          <FlatList
+          <FlashList
             data={ongoing}
             renderItem={renderTournamentCard}
             keyExtractor={tournamentKeyExtractor}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
-            scrollEventThrottle={16}
-            removeClippedSubviews={true}
-            initialNumToRender={3}
-            maxToRenderPerBatch={3}
-            windowSize={5}
-            getItemLayout={getItemLayout}
+            estimatedItemSize={CARD_LAYOUT_WIDTH}
           />
         </View>
 
@@ -224,19 +222,14 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
             title="Up Coming Tournaments"
             onSeeAll={() => navigation.navigate(ROUTES.TOURNAMENTS_TAB)}
           />
-          <FlatList
+          <FlashList
             data={upcoming}
             renderItem={renderUpcomingCard}
             keyExtractor={tournamentKeyExtractor}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
-            scrollEventThrottle={16}
-            removeClippedSubviews={true}
-            initialNumToRender={3}
-            maxToRenderPerBatch={3}
-            windowSize={5}
-            getItemLayout={getItemLayout}
+            estimatedItemSize={CARD_LAYOUT_WIDTH}
           />
         </View>
 
@@ -245,9 +238,7 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
             title="Top players"
             onSeeAll={() => navigation.navigate(ROUTES.LEADERBOARD_TAB)}
           />
-          <View style={styles.leaderboardList}>
-            {renderLeaderboardCards}
-          </View>
+          <View style={styles.leaderboardList}>{renderLeaderboardCards}</View>
         </View>
 
         <View style={styles.bottomSpacer} />
@@ -270,8 +261,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-  },
+  scrollContent: {},
   section: {
     marginTop: Spacing.xxl,
   },

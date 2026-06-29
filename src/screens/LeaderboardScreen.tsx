@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,20 +17,20 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {LeaderPlayer, UserProfile} from '../types';
-import {playerService, userService} from '../services';
+import { LeaderPlayer, UserProfile } from '../types';
+import { playerService, userService } from '../services';
 import TopTeamsPodium from '../components/TopTeamsPodium';
 import LeaderboardListRow from '../components/LeaderboardListRow';
 import PlayerAvatar from '../components/PlayerAvatar';
-import {Heading, Label} from '../components/Typography';
-import {Colors} from '../theme/colors';
-import {Spacing} from '../theme/spacing';
+import { Heading, Label } from '../components/Typography';
+import { Colors } from '../theme/colors';
+import { Spacing } from '../theme/spacing';
 
 const LeaderboardScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  
+
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderPlayer[]>([]);
@@ -59,13 +59,13 @@ const LeaderboardScreen: React.FC = () => {
 
   useEffect(() => {
     if (!loading) {
-      opacity.value = withDelay(100, withTiming(1, {duration: 500}));
-      translateY.value = withDelay(100, withTiming(0, {duration: 500}));
+      opacity.value = withDelay(100, withTiming(1, { duration: 500 }));
+      translateY.value = withDelay(100, withTiming(0, { duration: 500 }));
     }
   }, [loading, opacity, translateY]);
 
   const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
+    onScroll: event => {
       scrollY.value = event.contentOffset.y;
     },
   });
@@ -76,7 +76,12 @@ const LeaderboardScreen: React.FC = () => {
       [0, 50],
       ['transparent', Colors.dark.background],
     );
-    const elevation = interpolate(scrollY.value, [0, 50], [0, 8], Extrapolation.CLAMP);
+    const elevation = interpolate(
+      scrollY.value,
+      [0, 50],
+      [0, 8],
+      Extrapolation.CLAMP,
+    );
     return {
       backgroundColor: bgColor,
       elevation,
@@ -86,12 +91,13 @@ const LeaderboardScreen: React.FC = () => {
 
   const fadeStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{translateY: translateY.value}],
+    transform: [{ translateY: translateY.value }],
   }));
 
-  const renderItem: ListRenderItem<LeaderPlayer> = useCallback(({item}) => (
-    <LeaderboardListRow player={item} />
-  ), []);
+  const renderItem: ListRenderItem<LeaderPlayer> = useCallback(
+    ({ item }) => <LeaderboardListRow player={item} />,
+    [],
+  );
 
   if (loading || !profile) {
     return (
@@ -113,7 +119,13 @@ const LeaderboardScreen: React.FC = () => {
       />
 
       {/* Sticky Header */}
-      <Animated.View style={[styles.headerWrapper, {paddingTop: insets.top + Spacing.sm}, headerStyle]}>
+      <Animated.View
+        style={[
+          styles.headerWrapper,
+          { paddingTop: insets.top + Spacing.sm },
+          headerStyle,
+        ]}
+      >
         <View style={styles.headerContainer}>
           <PlayerAvatar
             uri={profile.avatar}
@@ -135,7 +147,10 @@ const LeaderboardScreen: React.FC = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, {paddingTop: insets.top + 90}]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 90 },
+        ]}
         style={fadeStyle}
         ListHeaderComponent={
           <>

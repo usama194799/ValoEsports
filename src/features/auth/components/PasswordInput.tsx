@@ -1,9 +1,13 @@
-import React, {useState} from 'react';
-import AuthInput, {AuthInputProps} from './AuthInput';
+import React, { useState } from 'react';
+import AuthInput, { AuthInputProps } from './AuthInput';
 
-interface PasswordInputProps extends Omit<AuthInputProps, 'rightIcon' | 'onRightIconPress' | 'secureTextEntry'> {}
+interface PasswordInputProps
+  extends Omit<
+    AuthInputProps,
+    'rightIcon' | 'onRightIconPress' | 'secureTextEntry'
+  > {}
 
-const PasswordInput: React.FC<PasswordInputProps> = (props) => {
+const PasswordInput: React.FC<PasswordInputProps> = props => {
   const [isVisible, setIsVisible] = useState(false);
 
   return (

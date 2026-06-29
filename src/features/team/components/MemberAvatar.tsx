@@ -1,7 +1,7 @@
 import React from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../../../theme/colors';
+import { Colors } from '../../../theme/colors';
 
 interface MemberAvatarProps {
   url: string;
@@ -28,12 +28,12 @@ const MemberAvatar: React.FC<MemberAvatarProps> = ({
   };
 
   return (
-    <View style={[styles.container, {width: size, height: size}]}>
+    <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={{uri: url}}
-        style={[styles.avatar, {borderRadius: size / 2}]}
+        source={{ uri: url }}
+        style={[styles.avatar, { borderRadius: size / 2 }]}
       />
-      
+
       {role && (role === 'captain' || role === 'co-leader') && (
         <View style={styles.roleBadge}>
           <Icon name="star" size={10} color={getRoleColor()} />
@@ -44,7 +44,9 @@ const MemberAvatar: React.FC<MemberAvatarProps> = ({
         <View
           style={[
             styles.onlineIndicator,
-            {backgroundColor: online ? Colors.success.main : Colors.text.muted},
+            {
+              backgroundColor: online ? Colors.success.main : Colors.text.muted,
+            },
           ]}
         />
       )}

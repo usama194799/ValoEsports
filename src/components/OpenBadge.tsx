@@ -1,13 +1,13 @@
 import React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
+import { StyleSheet, View, Text } from 'react-native';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
 
 interface OpenBadgeProps {
   label?: string;
 }
 
-const OpenBadge: React.FC<OpenBadgeProps> = ({label = 'Open'}) => {
+const OpenBadge: React.FC<OpenBadgeProps> = ({ label = 'Open' }) => {
   return (
     <View style={styles.badge}>
       <Text style={styles.text}>{label}</Text>

@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,15 +9,15 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {useTeamData} from '../hooks/useTeamData';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { useTeamData } from '../hooks/useTeamData';
 
 type EditTeamRouteProp = any;
 
@@ -25,8 +25,8 @@ const EditTeamScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute<EditTeamRouteProp>();
-  const {getTeamById, gamesList} = useTeamData();
-  
+  const { getTeamById, gamesList } = useTeamData();
+
   const teamId = route.params?.teamId;
   const team = getTeamById(teamId);
 
@@ -39,7 +39,7 @@ const EditTeamScreen = () => {
   });
 
   const updateForm = (key: string, value: string) => {
-    setForm(prev => ({...prev, [key]: value}));
+    setForm(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSave = useCallback(() => {
@@ -52,28 +52,43 @@ const EditTeamScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Edit Team</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.uploadSection}>
           <TouchableOpacity style={styles.bannerUpload} activeOpacity={0.8}>
-            <Image source={{uri: team.bannerUrl}} style={StyleSheet.absoluteFillObject} />
+            <Image
+              source={{ uri: team.bannerUrl }}
+              style={StyleSheet.absoluteFill as any}
+            />
             <View style={styles.overlay}>
-              <Icon name="camera-plus-outline" size={32} color={Colors.text.primary} />
+              <Icon
+                name="camera-plus-outline"
+                size={32}
+                color={Colors.text.primary}
+              />
             </View>
           </TouchableOpacity>
           <View style={styles.logoUploadWrapper}>
             <TouchableOpacity style={styles.logoUpload} activeOpacity={0.8}>
-              <Image source={{uri: team.logoUrl}} style={styles.logoImg} />
+              <Image source={{ uri: team.logoUrl }} style={styles.logoImg} />
               <View style={styles.overlay}>
-                <Icon name="camera-plus-outline" size={24} color={Colors.text.primary} />
+                <Icon
+                  name="camera-plus-outline"
+                  size={24}
+                  color={Colors.text.primary}
+                />
               </View>
             </TouchableOpacity>
           </View>
@@ -109,9 +124,9 @@ const EditTeamScreen = () => {
 
           <View style={styles.inputGroup}>
             <Label style={styles.inputLabel}>Description</Label>
-            <View style={[styles.inputWrapper, {height: 100}]}>
+            <View style={[styles.inputWrapper, { height: 100 }]}>
               <TextInput
-                style={[styles.input, {textAlignVertical: 'top'}]}
+                style={[styles.input, { textAlignVertical: 'top' }]}
                 placeholder="Tell us about your team..."
                 placeholderTextColor={Colors.text.muted}
                 multiline
@@ -124,13 +139,23 @@ const EditTeamScreen = () => {
 
           <View style={styles.inputGroup}>
             <Label style={styles.inputLabel}>Primary Game</Label>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipScroll}
+            >
               {gamesList.map(game => (
                 <TouchableOpacity
                   key={game}
                   style={[styles.chip, form.game === game && styles.chipActive]}
-                  onPress={() => updateForm('game', game)}>
-                  <Label style={[styles.chipText, form.game === game && styles.chipTextActive]}>
+                  onPress={() => updateForm('game', game)}
+                >
+                  <Label
+                    style={[
+                      styles.chipText,
+                      form.game === game && styles.chipTextActive,
+                    ]}
+                  >
                     {game}
                   </Label>
                 </TouchableOpacity>
@@ -140,7 +165,9 @@ const EditTeamScreen = () => {
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, {paddingBottom: insets.bottom || Spacing.lg}]}>
+      <View
+        style={[styles.footer, { paddingBottom: insets.bottom || Spacing.lg }]}
+      >
         <TouchableOpacity style={styles.createBtn} onPress={handleSave}>
           <Subheading style={styles.createText}>Save Changes</Subheading>
         </TouchableOpacity>
@@ -200,10 +227,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoImg: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',

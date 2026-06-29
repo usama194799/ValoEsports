@@ -1,23 +1,30 @@
 import React from 'react';
-import {StyleSheet, View, Image, ScrollView} from 'react-native';
-import {TournamentMatch} from '../types';
-import {Heading, Label, Subheading, Caption} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer} from './LayoutContainers';
+import { StyleSheet, View, Image, ScrollView } from 'react-native';
+import { TournamentMatch } from '../types';
+import {
+  Heading,
+  Label,
+  Subheading,
+  Caption,
+} from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { SectionContainer } from './LayoutContainers';
 
 interface MatchScheduleProps {
   schedule: TournamentMatch[];
 }
 
-const MatchCard: React.FC<{match: TournamentMatch}> = ({match}) => {
+const MatchCard: React.FC<{ match: TournamentMatch }> = ({ match }) => {
   const isLive = match.status === 'live';
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Caption style={styles.date}>{match.date} • {match.time}</Caption>
+        <Caption style={styles.date}>
+          {match.date} • {match.time}
+        </Caption>
         {isLive && (
           <View style={styles.liveBadge}>
             <View style={styles.liveDot} />
@@ -29,7 +36,7 @@ const MatchCard: React.FC<{match: TournamentMatch}> = ({match}) => {
       <View style={styles.teamsWrapper}>
         {/* Team A */}
         <View style={styles.team}>
-          <Image source={{uri: match.teamA.logo}} style={styles.logo} />
+          <Image source={{ uri: match.teamA.logo }} style={styles.logo} />
           <Subheading style={styles.teamName} numberOfLines={1}>
             {match.teamA.name}
           </Subheading>
@@ -48,7 +55,7 @@ const MatchCard: React.FC<{match: TournamentMatch}> = ({match}) => {
 
         {/* Team B */}
         <View style={styles.team}>
-          <Image source={{uri: match.teamB.logo}} style={styles.logo} />
+          <Image source={{ uri: match.teamB.logo }} style={styles.logo} />
           <Subheading style={styles.teamName} numberOfLines={1}>
             {match.teamB.name}
           </Subheading>
@@ -58,7 +65,7 @@ const MatchCard: React.FC<{match: TournamentMatch}> = ({match}) => {
   );
 };
 
-const MatchSchedule: React.FC<MatchScheduleProps> = ({schedule}) => {
+const MatchSchedule: React.FC<MatchScheduleProps> = ({ schedule }) => {
   if (!schedule || schedule.length === 0) return null;
 
   return (
@@ -66,7 +73,8 @@ const MatchSchedule: React.FC<MatchScheduleProps> = ({schedule}) => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+      >
         {schedule.map(match => (
           <MatchCard key={match.id} match={match} />
         ))}
@@ -100,7 +108,7 @@ const styles = StyleSheet.create({
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(232, 33, 74, 0.1)',
+    backgroundColor: Colors.primary.transparent.light,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
     borderRadius: Radius.full,

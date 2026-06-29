@@ -1,26 +1,21 @@
-import React, {useState, useCallback, useMemo} from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ScrollView,
-} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useState, useCallback, useMemo } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import { StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../navigation/types';
-import {ROUTES} from '../navigation/routes';
-import {Tournament} from '../types';
-import {db} from '../data/db';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { ROUTES } from '../navigation/routes';
+import { Tournament } from '../types';
+import { db } from '../data/db';
 import SearchHeader from '../components/SearchHeader';
 import TournamentListCard from '../components/TournamentListCard';
 import EmptyState from '../components/EmptyState';
-import {Heading, Label, Subheading} from '../components/Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
+import { Heading, Label, Subheading } from '../components/Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
 
 const RECENT_SEARCHES = ['PUBG Global', 'Valorant Open', 'Free Fire Weekly'];
 const TRENDING = ['Call of Duty Mobile Summer', 'BGMI Pro League'];
@@ -30,7 +25,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const SearchScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
-  
+
   const [query, setQuery] = useState('');
 
   const handleBack = useCallback(() => {
@@ -43,17 +38,25 @@ const SearchScreen: React.FC = () => {
       t =>
         t.name.toLowerCase().includes(query.toLowerCase()) ||
         t.gameName.toLowerCase().includes(query.toLowerCase()) ||
-        (t.organizer && t.organizer.toLowerCase().includes(query.toLowerCase())),
+        (t.organizer &&
+          t.organizer.toLowerCase().includes(query.toLowerCase())),
     );
   }, [query]);
 
-  const renderItem = useCallback(({item, index}: {item: Tournament; index: number}) => (
-    <TournamentListCard
-      item={item}
-      index={index}
-      onPress={() => navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {tournamentId: item.id})}
-    />
-  ), [navigation]);
+  const renderItem = useCallback(
+    ({ item, index }: { item: Tournament; index: number }) => (
+      <TournamentListCard
+        item={item}
+        index={index}
+        onPress={() =>
+          navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {
+            tournamentId: item.id,
+          })
+        }
+      />
+    ),
+    [navigation],
+  );
 
   const renderEmptySearch = () => {
     if (query.trim()) {
@@ -65,9 +68,13 @@ const SearchScreen: React.FC = () => {
         />
       );
     }
-    
+
     return (
-      <ScrollView style={styles.idleState} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        style={styles.idleState}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Recent Searches */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -81,7 +88,8 @@ const SearchScreen: React.FC = () => {
               <TouchableOpacity
                 key={item}
                 style={styles.historyChip}
-                onPress={() => setQuery(item)}>
+                onPress={() => setQuery(item)}
+              >
                 <Icon name="history" size={14} color={Colors.text.muted} />
                 <Label style={styles.historyLabel}>{item}</Label>
               </TouchableOpacity>
@@ -96,7 +104,8 @@ const SearchScreen: React.FC = () => {
             <TouchableOpacity
               key={item}
               style={styles.trendingRow}
-              onPress={() => setQuery(item)}>
+              onPress={() => setQuery(item)}
+            >
               <View style={styles.trendingRank}>
                 <Label style={styles.trendingRankText}>{i + 1}</Label>
               </View>
@@ -110,7 +119,7 @@ const SearchScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.root, {paddingTop: insets.top}]}>
+    <View style={[styles.root, { paddingTop: insets.top }]}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
@@ -126,13 +135,16 @@ const SearchScreen: React.FC = () => {
       </View>
 
       {query.trim() && searchResults.length > 0 ? (
-        <FlatList
-          data={searchResults}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          keyboardDismissMode="on-drag"
-        />
+        <View style={{ flex: 1 }}>
+          <FlashList
+            data={searchResults}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContent}
+            keyboardDismissMode="on-drag"
+            estimatedItemSize={120}
+          />
+        </View>
       ) : (
         renderEmptySearch()
       )}

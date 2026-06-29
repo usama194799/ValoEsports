@@ -1,7 +1,7 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Heading} from '../components/Typography';
-import {Colors} from '../theme/colors';
+import { StyleSheet, View } from 'react-native';
+import { Heading } from '../components/Typography';
+import { Colors } from '../theme/colors';
 
 const SettingsScreen: React.FC = () => {
   return (

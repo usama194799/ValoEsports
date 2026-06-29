@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   SharedValue,
   interpolateColor,
@@ -7,15 +7,15 @@ import Animated, {
   Extrapolation,
   interpolate,
 } from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import PlayerAvatar from './PlayerAvatar';
 import NotificationBell from './NotificationBell';
-import {Heading, Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
+import { Heading, Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
 
 interface DashboardHeaderProps {
   username: string;
@@ -36,13 +36,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const headerStyle = useAnimatedStyle(() => {
     if (!scrollY) return {};
-    
+
     const bgColor = interpolateColor(
       scrollY.value,
       [0, 100],
       ['transparent', Colors.dark.background],
     );
-    
+
     const elevation = interpolate(
       scrollY.value,
       [0, 100],
@@ -61,9 +61,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     <Animated.View
       style={[
         styles.wrapper,
-        {paddingTop: insets.top + Spacing.sm},
+        { paddingTop: insets.top + Spacing.sm },
         headerStyle,
-      ]}>
+      ]}
+    >
       <View style={[styles.container, Shadows.header]}>
         {/* Left: Avatar + User Info */}
         <View style={styles.leftSection}>
@@ -85,7 +86,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <TouchableOpacity
             onPress={onSettingsPress}
             activeOpacity={0.75}
-            style={styles.settingsBtn}>
+            style={styles.settingsBtn}
+          >
             <Icon name="cog-outline" size={20} color={Colors.text.primary} />
           </TouchableOpacity>
         </View>

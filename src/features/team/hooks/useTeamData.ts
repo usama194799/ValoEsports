@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import { useMemo } from 'react';
 import {
   DUMMY_TEAMS,
   DUMMY_MEMBERS,

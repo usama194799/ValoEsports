@@ -29,7 +29,13 @@ export interface Achievement {
 
 export interface SocialLink {
   id: string;
-  platform: 'discord' | 'youtube' | 'instagram' | 'facebook' | 'twitter' | 'twitch';
+  platform:
+    | 'discord'
+    | 'youtube'
+    | 'instagram'
+    | 'facebook'
+    | 'twitter'
+    | 'twitch';
   url: string;
   username: string;
 }
@@ -49,7 +55,7 @@ export interface PlayerProfile {
   bio: string;
   language: string;
   favouriteGame: string;
-  
+
   statistics: {
     matchesPlayed: number;
     wins: number;

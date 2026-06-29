@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,22 +7,22 @@ import Animated, {
   withTiming,
   withSequence,
 } from 'react-native-reanimated';
-import {Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
+import { Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
 
 interface LiveBadgeProps {
   label?: string;
 }
 
-const LiveBadge: React.FC<LiveBadgeProps> = ({label = 'Live'}) => {
+const LiveBadge: React.FC<LiveBadgeProps> = ({ label = 'Live' }) => {
   const opacity = useSharedValue(1);
 
   useEffect(() => {
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0.4, {duration: 600}),
-        withTiming(1, {duration: 600}),
+        withTiming(0.4, { duration: 600 }),
+        withTiming(1, { duration: 600 }),
       ),
       -1,
       false,

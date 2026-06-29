@@ -1,20 +1,30 @@
 import React from 'react';
-import {StyleSheet, View, ScrollView, Image, TouchableOpacity} from 'react-native';
-import {ParticipatingTeam} from '../types';
-import {Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer} from './LayoutContainers';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import { ParticipatingTeam } from '../types';
+import { Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { SectionContainer } from './LayoutContainers';
 
 interface ParticipatingTeamsProps {
   teams: ParticipatingTeam[];
 }
 
-const TeamCard: React.FC<{team: ParticipatingTeam}> = ({team}) => (
+const TeamCard: React.FC<{ team: ParticipatingTeam }> = ({ team }) => (
   <TouchableOpacity style={styles.card} activeOpacity={0.8}>
     <View style={styles.logoWrapper}>
-      <Image source={{uri: team.logo}} style={styles.logo} resizeMode="cover" />
+      <Image
+        source={{ uri: team.logo }}
+        style={styles.logo}
+        resizeMode="cover"
+      />
     </View>
     <Subheading style={styles.teamName} numberOfLines={1}>
       {team.name}
@@ -32,18 +42,20 @@ const TeamCard: React.FC<{team: ParticipatingTeam}> = ({team}) => (
   </TouchableOpacity>
 );
 
-const ParticipatingTeams: React.FC<ParticipatingTeamsProps> = ({teams}) => (
+const ParticipatingTeams: React.FC<ParticipatingTeamsProps> = ({ teams }) => (
   <SectionContainer
     title="Participating Teams"
     headerRight={
       <TouchableOpacity>
         <Label style={styles.viewAll}>View All</Label>
       </TouchableOpacity>
-    }>
+    }
+  >
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}>
+      contentContainerStyle={styles.scrollContent}
+    >
       {teams.map(team => (
         <TeamCard key={team.id} team={team} />
       ))}
@@ -52,8 +64,8 @@ const ParticipatingTeams: React.FC<ParticipatingTeamsProps> = ({teams}) => (
 );
 
 const styles = StyleSheet.create({
-  viewAll: {color: Colors.primary.main, fontWeight: '600'},
-  scrollContent: {gap: Spacing.md},
+  viewAll: { color: Colors.primary.main, fontWeight: '600' },
+  scrollContent: { gap: Spacing.md },
   card: {
     width: 130,
     backgroundColor: Colors.dark.surface,
@@ -73,12 +85,21 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: Spacing.sm,
   },
-  logo: {width: '100%', height: '100%'},
-  teamName: {fontSize: 14, textAlign: 'center', marginBottom: 2},
-  captainText: {fontSize: 10, color: Colors.text.muted, marginBottom: Spacing.sm},
-  statsRow: {flexDirection: 'row', alignItems: 'center', gap: 4},
-  statLabel: {fontSize: 10, color: Colors.text.secondary},
-  dot: {width: 3, height: 3, borderRadius: 1.5, backgroundColor: Colors.text.muted},
+  logo: { width: '100%', height: '100%' },
+  teamName: { fontSize: 14, textAlign: 'center', marginBottom: 2 },
+  captainText: {
+    fontSize: 10,
+    color: Colors.text.muted,
+    marginBottom: Spacing.sm,
+  },
+  statsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  statLabel: { fontSize: 10, color: Colors.text.secondary },
+  dot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.text.muted,
+  },
 });
 
 export default React.memo(ParticipatingTeams);

@@ -1,17 +1,17 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DetailedTournament} from '../types';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { DetailedTournament } from '../types';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface RegistrationBottomSheetProps {
   visible: boolean;
@@ -32,11 +32,11 @@ const RegistrationBottomSheet: React.FC<RegistrationBottomSheetProps> = ({
 
   useEffect(() => {
     if (visible) {
-      opacity.value = withTiming(1, {duration: 150});
-      translateY.value = withTiming(0, {duration: 200});
+      opacity.value = withTiming(1, { duration: 150 });
+      translateY.value = withTiming(0, { duration: 200 });
     } else {
-      opacity.value = withTiming(0, {duration: 150});
-      translateY.value = withTiming(1000, {duration: 200});
+      opacity.value = withTiming(0, { duration: 150 });
+      translateY.value = withTiming(1000, { duration: 200 });
     }
   }, [visible, opacity, translateY]);
 
@@ -46,14 +46,27 @@ const RegistrationBottomSheet: React.FC<RegistrationBottomSheetProps> = ({
   }));
 
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: translateY.value}],
+    transform: [{ translateY: translateY.value }],
   }));
 
   return (
-    <Animated.View style={[styles.overlay, overlayStyle]} pointerEvents={visible ? 'auto' : 'none'}>
-      <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
-      
-      <Animated.View style={[styles.sheet, {paddingBottom: insets.bottom || Spacing.xl}, sheetStyle]}>
+    <Animated.View
+      style={[styles.overlay, overlayStyle]}
+      pointerEvents={visible ? 'auto' : 'none'}
+    >
+      <TouchableOpacity
+        style={styles.backdrop}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+
+      <Animated.View
+        style={[
+          styles.sheet,
+          { paddingBottom: insets.bottom || Spacing.xl },
+          sheetStyle,
+        ]}
+      >
         <View style={styles.header}>
           <Heading style={styles.headerTitle}>Confirm Registration</Heading>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -62,8 +75,10 @@ const RegistrationBottomSheet: React.FC<RegistrationBottomSheetProps> = ({
         </View>
 
         <View style={styles.content}>
-          <Subheading style={styles.tournamentName}>{tournament.name}</Subheading>
-          
+          <Subheading style={styles.tournamentName}>
+            {tournament.name}
+          </Subheading>
+
           <View style={styles.summaryBox}>
             <View style={styles.summaryRow}>
               <Label style={styles.summaryLabel}>Format</Label>
@@ -75,12 +90,15 @@ const RegistrationBottomSheet: React.FC<RegistrationBottomSheetProps> = ({
             </View>
             <View style={[styles.summaryRow, styles.summaryRowLast]}>
               <Label style={styles.summaryLabel}>Total Entry Fee</Label>
-              <Heading style={styles.summaryTotal}>{tournament.entryFee}</Heading>
+              <Heading style={styles.summaryTotal}>
+                {tournament.entryFee}
+              </Heading>
             </View>
           </View>
-          
+
           <Label style={styles.disclaimer}>
-            By confirming, you agree to the Tournament Rules and the Organizer's Code of Conduct.
+            By confirming, you agree to the Tournament Rules and the Organizer's
+            Code of Conduct.
           </Label>
         </View>
 
@@ -100,13 +118,19 @@ const RegistrationBottomSheet: React.FC<RegistrationBottomSheetProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 999,
     justifyContent: 'flex-end',
   },
   backdrop: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.neutral.overlay,
   },
   sheet: {

@@ -1,10 +1,10 @@
 import React from 'react';
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
-import {Shadows} from '../theme/shadow';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
+import { Shadows } from '../theme/shadow';
 
 interface SearchHeaderProps {
   placeholder?: string;
@@ -31,10 +31,19 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         activeOpacity={0.8}
         onPress={onPress}
         disabled={!onPress}
-        style={[styles.searchBox, Shadows.card]}>
-        <Icon name="magnify" size={22} color={Colors.text.muted} style={styles.icon} />
-        
-        <View pointerEvents={editable ? 'auto' : 'none'} style={styles.inputWrapper}>
+        style={[styles.searchBox, Shadows.card]}
+      >
+        <Icon
+          name="magnify"
+          size={22}
+          color={Colors.text.muted}
+          style={styles.icon}
+        />
+
+        <View
+          pointerEvents={editable ? 'auto' : 'none'}
+          style={styles.inputWrapper}
+        >
           <TextInput
             style={styles.input}
             placeholder={placeholder}
@@ -48,7 +57,11 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         </View>
 
         <TouchableOpacity onPress={onVoicePress} style={styles.voiceBtn}>
-          <Icon name="microphone-outline" size={20} color={Colors.text.secondary} />
+          <Icon
+            name="microphone-outline"
+            size={20}
+            color={Colors.text.secondary}
+          />
         </TouchableOpacity>
       </TouchableOpacity>
     </View>

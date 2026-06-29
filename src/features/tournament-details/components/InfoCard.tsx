@@ -1,18 +1,23 @@
-import React, {useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {DetailedTournament} from '../types';
+import React, { useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { DetailedTournament } from '../types';
 import ProgressBar from '../../../components/ProgressBar';
-import {Heading, Label, Caption} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer, CardContainer, InfoRow, InfoItem} from './LayoutContainers';
+import { Heading, Label, Caption } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import {
+  SectionContainer,
+  CardContainer,
+  InfoRow,
+  InfoItem,
+} from './LayoutContainers';
 
 interface InfoCardProps {
   tournament: DetailedTournament;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({tournament}) => {
-  const {progress, percentage} = useMemo(() => {
+const InfoCard: React.FC<InfoCardProps> = ({ tournament }) => {
+  const { progress, percentage } = useMemo(() => {
     const p = tournament.slotsUsed / tournament.slots;
     return {
       progress: p,
@@ -26,24 +31,65 @@ const InfoCard: React.FC<InfoCardProps> = ({tournament}) => {
         {/* Top Details Grid - Perfect 2 Column Layout */}
         <View style={styles.grid}>
           <InfoRow>
-            <InfoItem icon="gamepad-variant" label="Game" value={tournament.gameName} />
-            <InfoItem icon="sitemap" label="Format" value={`${tournament.teamSize} ${tournament.format}`} />
+            <InfoItem
+              icon="gamepad-variant"
+              label="Game"
+              value={tournament.gameName}
+            />
+            <InfoItem
+              icon="sitemap"
+              label="Format"
+              value={`${tournament.teamSize} ${tournament.format}`}
+            />
           </InfoRow>
           <InfoRow>
-            <InfoItem icon="cash-multiple" label="Prize Pool" value={tournament.prizePool} highlight />
-            <InfoItem icon="ticket-percent" label="Entry Fee" value={tournament.entryFee} />
+            <InfoItem
+              icon="cash-multiple"
+              label="Prize Pool"
+              value={tournament.prizePool}
+              highlight
+            />
+            <InfoItem
+              icon="ticket-percent"
+              label="Entry Fee"
+              value={tournament.entryFee}
+            />
           </InfoRow>
           <InfoRow>
-            <InfoItem icon="monitor-cellphone" label="Platform" value={tournament.platform} />
-            <InfoItem icon="earth" label="Region" value={tournament.serverRegion} />
+            <InfoItem
+              icon="monitor-cellphone"
+              label="Platform"
+              value={tournament.platform}
+            />
+            <InfoItem
+              icon="earth"
+              label="Region"
+              value={tournament.serverRegion}
+            />
           </InfoRow>
           <InfoRow>
-            <InfoItem icon="account-multiple-plus" label="Total Slots" value={tournament.slots.toString()} />
-            <InfoItem icon="account-group" label="Registered Teams" value={tournament.slotsUsed.toString()} />
+            <InfoItem
+              icon="account-multiple-plus"
+              label="Total Slots"
+              value={tournament.slots.toString()}
+            />
+            <InfoItem
+              icon="account-group"
+              label="Registered Teams"
+              value={tournament.slotsUsed.toString()}
+            />
           </InfoRow>
           <InfoRow>
-            <InfoItem icon="calendar" label="Date" value={tournament.startDate} />
-            <InfoItem icon="clock-outline" label="Time" value={tournament.startTime} />
+            <InfoItem
+              icon="calendar"
+              label="Date"
+              value={tournament.startDate}
+            />
+            <InfoItem
+              icon="clock-outline"
+              label="Time"
+              value={tournament.startTime}
+            />
           </InfoRow>
         </View>
 
@@ -57,7 +103,9 @@ const InfoCard: React.FC<InfoCardProps> = ({tournament}) => {
             <Heading style={styles.slotsValue}>{percentage}%</Heading>
           </View>
           <ProgressBar progress={progress} percentage={percentage} />
-          <Caption style={styles.deadlineText}>Deadline: {tournament.registrationDeadline}</Caption>
+          <Caption style={styles.deadlineText}>
+            Deadline: {tournament.registrationDeadline}
+          </Caption>
         </View>
       </CardContainer>
     </SectionContainer>

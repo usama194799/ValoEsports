@@ -1,7 +1,7 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
+import { Image, StyleSheet, View } from 'react-native';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
 
 interface PlayerAvatarProps {
   uri: string;
@@ -16,7 +16,7 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   borderWidth = 2,
   borderColor = Colors.gaming.avatarRing,
 }) => {
-  const imageSource = React.useMemo(() => ({uri}), [uri]);
+  const imageSource = React.useMemo(() => ({ uri }), [uri]);
 
   return (
     <View
@@ -29,7 +29,8 @@ const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
           borderWidth,
           borderColor,
         },
-      ]}>
+      ]}
+    >
       <Image
         source={imageSource}
         style={[

@@ -1,13 +1,13 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, Pressable} from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../theme/colors';
-import {Label} from './Typography';
+import { Colors } from '../theme/colors';
+import { Label } from './Typography';
 
 interface NotificationBellProps {
   unreadCount?: number;
@@ -21,11 +21,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   const opacity = useSharedValue(1);
 
   const handlePressIn = useCallback(() => {
-    opacity.value = withTiming(0.7, {duration: 100});
+    opacity.value = withTiming(0.7, { duration: 100 });
   }, [opacity]);
 
   const handlePressOut = useCallback(() => {
-    opacity.value = withTiming(1, {duration: 100});
+    opacity.value = withTiming(1, { duration: 100 });
   }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -38,8 +38,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        android_ripple={{color: 'rgba(255,255,255,0.1)', borderless: true}}
-        style={styles.button}>
+        android_ripple={{
+          color: Colors.neutral.whiteTransparent.medium,
+          borderless: true,
+        }}
+        style={styles.button}
+      >
         <Icon name="bell-outline" size={20} color={Colors.text.primary} />
         {unreadCount > 0 && (
           <View style={styles.badge}>

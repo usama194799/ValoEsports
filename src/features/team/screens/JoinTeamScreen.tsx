@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,19 +6,19 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {useTeamData} from '../hooks/useTeamData';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { useTeamData } from '../hooks/useTeamData';
 import TeamCard from '../components/TeamCard';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../../navigation/types';
-import {ROUTES} from '../../../navigation/routes';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../navigation/types';
+import { ROUTES } from '../../../navigation/routes';
 
 type JoinTeamNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -27,8 +27,8 @@ const JoinTeamScreen = () => {
   const navigation = useNavigation<JoinTeamNavigationProp>();
   const [code, setCode] = useState('');
   const [search, setSearch] = useState('');
-  
-  const {teams} = useTeamData();
+
+  const { teams } = useTeamData();
 
   const handleJoinByCode = useCallback(() => {
     if (code.length === 6) {
@@ -39,31 +39,42 @@ const JoinTeamScreen = () => {
 
   const handleTeamPress = useCallback(
     (teamId: string) => {
-      navigation.navigate(ROUTES.TEAM_DETAILS, {teamId});
+      navigation.navigate(ROUTES.TEAM_DETAILS, { teamId });
     },
     [navigation],
   );
 
   return (
     <View style={styles.root}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Join Team</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Join by Code */}
         <View style={styles.section}>
           <Heading style={styles.sectionTitle}>Have an invite code?</Heading>
-          <Label style={styles.sectionDesc}>Enter the 6-digit code provided by the team captain.</Label>
-          
+          <Label style={styles.sectionDesc}>
+            Enter the 6-digit code provided by the team captain.
+          </Label>
+
           <View style={styles.codeRow}>
             <View style={styles.codeInputWrapper}>
-              <Icon name="ticket-confirmation-outline" size={20} color={Colors.text.muted} />
+              <Icon
+                name="ticket-confirmation-outline"
+                size={20}
+                color={Colors.text.muted}
+              />
               <TextInput
                 style={styles.codeInput}
                 placeholder="000000"
@@ -75,15 +86,24 @@ const JoinTeamScreen = () => {
               />
             </View>
             <TouchableOpacity
-              style={[styles.joinBtn, code.length === 6 && styles.joinBtnActive]}
+              style={[
+                styles.joinBtn,
+                code.length === 6 && styles.joinBtnActive,
+              ]}
               onPress={handleJoinByCode}
-              disabled={code.length !== 6}>
-              <Subheading style={[styles.joinText, code.length === 6 && styles.joinTextActive]}>
+              disabled={code.length !== 6}
+            >
+              <Subheading
+                style={[
+                  styles.joinText,
+                  code.length === 6 && styles.joinTextActive,
+                ]}
+              >
                 Join
               </Subheading>
             </TouchableOpacity>
           </View>
-          
+
           <TouchableOpacity style={styles.qrBtn}>
             <Icon name="qrcode-scan" size={20} color={Colors.primary.main} />
             <Label style={styles.qrText}>Scan QR Code</Label>
@@ -117,7 +137,6 @@ const JoinTeamScreen = () => {
             />
           ))}
         </View>
-
       </ScrollView>
     </View>
   );

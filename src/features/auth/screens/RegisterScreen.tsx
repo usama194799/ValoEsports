@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,15 +9,15 @@ import {
   Alert,
   Text,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
 import AuthInput from '../components/AuthInput';
 import PasswordInput from '../components/PasswordInput';
 import AuthButton from '../components/AuthButton';
@@ -45,7 +45,7 @@ const RegisterScreen = () => {
     const newErrors: Record<string, string> = {};
     if (!form.fullName) newErrors.fullName = 'Required';
     if (!form.username) newErrors.username = 'Required';
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email || !emailRegex.test(form.email)) {
       newErrors.email = 'Valid email is required';
@@ -60,7 +60,10 @@ const RegisterScreen = () => {
     }
 
     if (!agreed) {
-      Alert.alert('Terms Required', 'You must agree to the Terms & Conditions.');
+      Alert.alert(
+        'Terms Required',
+        'You must agree to the Terms & Conditions.',
+      );
       return false;
     }
 
@@ -70,30 +73,38 @@ const RegisterScreen = () => {
 
   const handleRegister = () => {
     if (!validate()) return;
-    
+
     // Pass data to OTP Verification Screen
-    navigation.navigate('OTPVerification', {email: form.email, intent: 'register'});
+    navigation.navigate('OTPVerification', {
+      email: form.email,
+      intent: 'register',
+    });
   };
 
   const updateForm = (key: string, value: string) => {
-    setForm(prev => ({...prev, [key]: value}));
+    setForm(prev => ({ ...prev, [key]: value }));
     // Clear error for this field
     if (errors[key]) {
-      setErrors(prev => ({...prev, [key]: ''}));
+      setErrors(prev => ({ ...prev, [key]: '' }));
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, {paddingTop: insets.top || Spacing.xl}]}
-        showsVerticalScrollIndicator={false}>
-        
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top || Spacing.xl },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
 
@@ -112,7 +123,7 @@ const RegisterScreen = () => {
           <AuthInput
             label="Full Name"
             value={form.fullName}
-            onChangeText={(v) => updateForm('fullName', v)}
+            onChangeText={v => updateForm('fullName', v)}
             leftIcon="account-outline"
             error={errors.fullName}
           />
@@ -120,7 +131,7 @@ const RegisterScreen = () => {
           <AuthInput
             label="Username"
             value={form.username}
-            onChangeText={(v) => updateForm('username', v)}
+            onChangeText={v => updateForm('username', v)}
             leftIcon="at"
             autoCapitalize="none"
             error={errors.username}
@@ -129,7 +140,7 @@ const RegisterScreen = () => {
           <AuthInput
             label="Email Address"
             value={form.email}
-            onChangeText={(v) => updateForm('email', v)}
+            onChangeText={v => updateForm('email', v)}
             leftIcon="email-outline"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -139,7 +150,7 @@ const RegisterScreen = () => {
           <AuthInput
             label="Phone Number"
             value={form.phone}
-            onChangeText={(v) => updateForm('phone', v)}
+            onChangeText={v => updateForm('phone', v)}
             leftIcon="phone-outline"
             keyboardType="phone-pad"
             error={errors.phone}
@@ -148,7 +159,7 @@ const RegisterScreen = () => {
           <PasswordInput
             label="Password"
             value={form.password}
-            onChangeText={(v) => updateForm('password', v)}
+            onChangeText={v => updateForm('password', v)}
             leftIcon="lock-outline"
             error={errors.password}
           />
@@ -156,7 +167,7 @@ const RegisterScreen = () => {
           <PasswordInput
             label="Confirm Password"
             value={form.confirmPassword}
-            onChangeText={(v) => updateForm('confirmPassword', v)}
+            onChangeText={v => updateForm('confirmPassword', v)}
             leftIcon="lock-check-outline"
             error={errors.confirmPassword}
           />
@@ -164,14 +175,17 @@ const RegisterScreen = () => {
           <TouchableOpacity
             style={styles.termsBtn}
             onPress={() => setAgreed(!agreed)}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Icon
               name={agreed ? 'checkbox-marked' : 'checkbox-blank-outline'}
               size={20}
               color={agreed ? Colors.primary.main : Colors.text.muted}
             />
             <Label style={styles.termsText}>
-              I accept the <Text style={styles.termsLink}>Terms & Conditions</Text> and <Text style={styles.termsLink}>Privacy Policy</Text>
+              I accept the{' '}
+              <Text style={styles.termsLink}>Terms & Conditions</Text> and{' '}
+              <Text style={styles.termsLink}>Privacy Policy</Text>
             </Label>
           </TouchableOpacity>
 

@@ -1,22 +1,22 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
-import {FlashList} from '@shopify/flash-list';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {useTeamData} from '../hooks/useTeamData';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { useTeamData } from '../hooks/useTeamData';
 import MemberAvatar from '../components/MemberAvatar';
 
 const TeamMembersScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute<any>();
-  const {getTeamMembers} = useTeamData();
+  const { getTeamMembers } = useTeamData();
 
   const teamId = route.params?.teamId;
   const members = getTeamMembers(teamId);
@@ -26,29 +26,43 @@ const TeamMembersScreen = () => {
       'Manage Member',
       `What would you like to do with ${member.name}?`,
       [
-        {text: 'Promote to Co-Leader', onPress: () => console.log('Promote')},
-        {text: 'Kick from Team', onPress: () => console.log('Kick'), style: 'destructive'},
-        {text: 'Cancel', style: 'cancel'},
+        { text: 'Promote to Co-Leader', onPress: () => console.log('Promote') },
+        {
+          text: 'Kick from Team',
+          onPress: () => console.log('Kick'),
+          style: 'destructive',
+        },
+        { text: 'Cancel', style: 'cancel' },
       ],
-      {cancelable: true}
+      { cancelable: true },
     );
   };
 
   const renderItem = useCallback(
-    ({item}: {item: any}) => (
+    ({ item }: { item: any }) => (
       <View style={styles.memberRow}>
-        <MemberAvatar url={item.avatarUrl} size={48} online={item.online} role={item.role} />
+        <MemberAvatar
+          url={item.avatarUrl}
+          size={48}
+          online={item.online}
+          role={item.role}
+        />
         <View style={styles.memberInfo}>
           <Subheading style={styles.memberName}>{item.name}</Subheading>
           <Label style={styles.memberRole}>
-            {item.role === 'captain' ? 'Captain' : item.role === 'co-leader' ? 'Co-Leader' : 'Player'}
+            {item.role === 'captain'
+              ? 'Captain'
+              : item.role === 'co-leader'
+              ? 'Co-Leader'
+              : 'Player'}
             {' • '}
             Level {item.level}
           </Label>
         </View>
         <TouchableOpacity
           style={styles.actionBtn}
-          onPress={() => handleMemberAction(item)}>
+          onPress={() => handleMemberAction(item)}
+        >
           <Icon name="dots-horizontal" size={24} color={Colors.text.muted} />
         </TouchableOpacity>
       </View>
@@ -58,8 +72,11 @@ const TeamMembersScreen = () => {
 
   return (
     <View style={styles.root}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Team Members</Heading>

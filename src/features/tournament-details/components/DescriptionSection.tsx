@@ -1,19 +1,21 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import {Body, Label} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer} from './LayoutContainers';
+import { Body, Label } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { SectionContainer } from './LayoutContainers';
 
 interface DescriptionSectionProps {
   description: string;
 }
 
-const DescriptionSection: React.FC<DescriptionSectionProps> = ({description}) => {
+const DescriptionSection: React.FC<DescriptionSectionProps> = ({
+  description,
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   const textStyle = useAnimatedStyle(() => ({
@@ -28,7 +30,8 @@ const DescriptionSection: React.FC<DescriptionSectionProps> = ({description}) =>
       <TouchableOpacity
         style={styles.readMoreBtn}
         onPress={() => setExpanded(!expanded)}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <Label style={styles.readMoreText}>
           {expanded ? 'Read Less' : 'Read More'}
         </Label>

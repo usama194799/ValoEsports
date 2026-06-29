@@ -1,5 +1,5 @@
-import {db} from '../data/db';
-import {LeaderPlayer} from '../types';
+import { db } from '../data/db';
+import { LeaderPlayer } from '../types';
 
 const DELAY_MS = 300;
 

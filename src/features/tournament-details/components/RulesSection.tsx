@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -10,33 +10,38 @@ import Animated, {
   runOnUI,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {TournamentRule} from '../types';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer} from './LayoutContainers';
+import { TournamentRule } from '../types';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { SectionContainer } from './LayoutContainers';
 
 interface RulesSectionProps {
   rules: TournamentRule[];
 }
 
-const AccordionItem: React.FC<{rule: TournamentRule; index: number}> = ({rule, index}) => {
+const AccordionItem: React.FC<{ rule: TournamentRule; index: number }> = ({
+  rule,
+  index,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const listRef = useAnimatedRef<Animated.View>();
   const heightValue = useSharedValue(0);
 
   const derivedHeight = useDerivedValue(() =>
-    withTiming(heightValue.value, {duration: 300}),
+    withTiming(heightValue.value, { duration: 300 }),
   );
 
   const bodyStyle = useAnimatedStyle(() => ({
     height: derivedHeight.value,
-    opacity: withTiming(expanded ? 1 : 0, {duration: 300}),
+    opacity: withTiming(expanded ? 1 : 0, { duration: 300 }),
   }));
 
   const iconStyle = useAnimatedStyle(() => ({
-    transform: [{rotate: withTiming(expanded ? '180deg' : '0deg', {duration: 200})}],
+    transform: [
+      { rotate: withTiming(expanded ? '180deg' : '0deg', { duration: 200 }) },
+    ],
   }));
 
   const toggle = () => {
@@ -60,7 +65,8 @@ const AccordionItem: React.FC<{rule: TournamentRule; index: number}> = ({rule, i
       <TouchableOpacity
         style={styles.header}
         onPress={toggle}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <View style={styles.headerLeft}>
           <View style={styles.numberBadge}>
             <Label style={styles.numberText}>{index + 1}</Label>
@@ -80,7 +86,8 @@ const AccordionItem: React.FC<{rule: TournamentRule; index: number}> = ({rule, i
             if (expanded) {
               heightValue.value = e.nativeEvent.layout.height;
             }
-          }}>
+          }}
+        >
           <Label style={styles.ruleContent}>{rule.content}</Label>
         </Animated.View>
       </Animated.View>
@@ -88,7 +95,7 @@ const AccordionItem: React.FC<{rule: TournamentRule; index: number}> = ({rule, i
   );
 };
 
-const RulesSection: React.FC<RulesSectionProps> = ({rules}) => {
+const RulesSection: React.FC<RulesSectionProps> = ({ rules }) => {
   return (
     <SectionContainer title="Rules & Regulations">
       <View style={styles.rulesList}>

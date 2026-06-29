@@ -1,46 +1,56 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Heading, Label} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {useProfileData} from '../hooks/useProfileData';
+import { Heading, Label } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { useProfileData } from '../hooks/useProfileData';
 import SocialLinkRow from '../components/SocialLinkRow';
 
 const SocialLinksScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const {profile} = useProfileData();
+  const { profile } = useProfileData();
 
-  const renderEmptyState = useCallback(() => (
-    <View style={styles.emptyContainer}>
-      <Icon name="link-variant-off" size={64} color={Colors.neutral.borderLight} />
-      <Heading style={styles.emptyTitle}>No Social Links</Heading>
-      <Label style={styles.emptySubtitle}>Connect your social accounts in settings.</Label>
-    </View>
-  ), []);
+  const renderEmptyState = useCallback(
+    () => (
+      <View style={styles.emptyContainer}>
+        <Icon
+          name="link-variant-off"
+          size={64}
+          color={Colors.neutral.borderLight}
+        />
+        <Heading style={styles.emptyTitle}>No Social Links</Heading>
+        <Label style={styles.emptySubtitle}>
+          Connect your social accounts in settings.
+        </Label>
+      </View>
+    ),
+    [],
+  );
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Social Links</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {(!profile?.socialLinks || profile.socialLinks.length === 0) ? (
-          renderEmptyState()
-        ) : (
-          profile.socialLinks.map(link => (
-            <SocialLinkRow key={link.id} social={link} />
-          ))
-        )}
+        {!profile?.socialLinks || profile.socialLinks.length === 0
+          ? renderEmptyState()
+          : profile.socialLinks.map(link => (
+              <SocialLinkRow key={link.id} social={link} />
+            ))}
       </ScrollView>
     </View>
   );

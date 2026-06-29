@@ -1,8 +1,8 @@
-import React, {useRef, useState} from 'react';
-import {StyleSheet, View, TextInput, Pressable} from 'react-native';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
+import React, { useRef, useState } from 'react';
+import { StyleSheet, View, TextInput, Pressable } from 'react-native';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
 
 interface OTPInputProps {
   length?: number;
@@ -10,7 +10,7 @@ interface OTPInputProps {
   onChange: (value: string) => void;
 }
 
-const OTPInput: React.FC<OTPInputProps> = ({length = 6, value, onChange}) => {
+const OTPInput: React.FC<OTPInputProps> = ({ length = 6, value, onChange }) => {
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -35,7 +35,8 @@ const OTPInput: React.FC<OTPInputProps> = ({length = 6, value, onChange}) => {
                   styles.box,
                   isActive && styles.boxActive,
                   isFilled && styles.boxFilled,
-                ]}>
+                ]}
+              >
                 <TextInput
                   style={styles.text}
                   value={digit}
@@ -46,13 +47,13 @@ const OTPInput: React.FC<OTPInputProps> = ({length = 6, value, onChange}) => {
             );
           })}
       </Pressable>
-      
+
       {/* Hidden actual input */}
       <TextInput
         ref={inputRef}
         style={styles.hiddenInput}
         value={value}
-        onChangeText={(text) => {
+        onChangeText={text => {
           if (text.length <= length) onChange(text);
         }}
         keyboardType="number-pad"

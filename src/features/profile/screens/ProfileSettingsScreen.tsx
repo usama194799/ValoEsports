@@ -1,13 +1,19 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, TouchableOpacity, ScrollView, Switch} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  Switch,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {useAuth} from '../../auth/hooks/useAuth';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 interface SettingRowProps {
   icon: string;
@@ -16,7 +22,12 @@ interface SettingRowProps {
   onValueChange: (val: boolean) => void;
 }
 
-const SettingRow: React.FC<SettingRowProps> = ({icon, title, value, onValueChange}) => (
+const SettingRow: React.FC<SettingRowProps> = ({
+  icon,
+  title,
+  value,
+  onValueChange,
+}) => (
   <View style={styles.settingRow}>
     <View style={styles.settingRowLeft}>
       <View style={styles.iconWrapper}>
@@ -27,7 +38,10 @@ const SettingRow: React.FC<SettingRowProps> = ({icon, title, value, onValueChang
     <Switch
       value={value}
       onValueChange={onValueChange}
-      trackColor={{false: Colors.neutral.borderLight, true: Colors.primary.main}}
+      trackColor={{
+        false: Colors.neutral.borderLight,
+        true: Colors.primary.main,
+      }}
       thumbColor={Colors.neutral.white}
     />
   </View>
@@ -36,7 +50,7 @@ const SettingRow: React.FC<SettingRowProps> = ({icon, title, value, onValueChang
 const ProfileSettingsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const {logout} = useAuth();
+  const { logout } = useAuth();
 
   const [settings, setSettings] = useState({
     privateProfile: false,
@@ -50,21 +64,26 @@ const ProfileSettingsScreen = () => {
   });
 
   const updateSetting = (key: keyof typeof settings, value: boolean) => {
-    setSettings(prev => ({...prev, [key]: value}));
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Profile Settings</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Label style={styles.sectionHeader}>Privacy & Visibility</Label>
         <View style={styles.card}>
           <SettingRow
@@ -133,11 +152,14 @@ const ProfileSettingsScreen = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.logoutBtn}
+          onPress={logout}
+          activeOpacity={0.7}
+        >
           <Icon name="logout" size={24} color={Colors.danger.main} />
           <Heading style={styles.logoutText}>Log Out</Heading>
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );
@@ -215,12 +237,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.sm,
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    backgroundColor: Colors.danger.transparent.medium,
     padding: Spacing.md,
     borderRadius: 12,
     marginTop: Spacing.xl,
     borderWidth: 1,
-    borderColor: 'rgba(255, 59, 48, 0.2)',
+    borderColor: Colors.danger.transparent.dark,
   },
   logoutText: {
     color: Colors.danger.main,

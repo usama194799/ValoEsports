@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, TouchableOpacity, View, ScrollView} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,12 +7,12 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Label, Subheading} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { Heading, Label, Subheading } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TournamentFiltersSheetProps {
   visible: boolean;
@@ -21,19 +21,25 @@ interface TournamentFiltersSheetProps {
   onReset: () => void;
 }
 
-const FilterSection: React.FC<{title: string; options: string[]; selected?: string}> = ({
-  title,
-  options,
-  selected,
-}) => (
+const FilterSection: React.FC<{
+  title: string;
+  options: string[];
+  selected?: string;
+}> = ({ title, options, selected }) => (
   <View style={styles.section}>
     <Label style={styles.sectionTitle}>{title}</Label>
     <View style={styles.chipRow}>
       {options.map(opt => (
         <TouchableOpacity
           key={opt}
-          style={[styles.chip, selected === opt && styles.chipSelected]}>
-          <Label style={[styles.chipLabel, selected === opt && styles.chipLabelSelected]}>
+          style={[styles.chip, selected === opt && styles.chipSelected]}
+        >
+          <Label
+            style={[
+              styles.chipLabel,
+              selected === opt && styles.chipLabelSelected,
+            ]}
+          >
             {opt}
           </Label>
         </TouchableOpacity>
@@ -54,11 +60,11 @@ const TournamentFiltersSheet: React.FC<TournamentFiltersSheetProps> = ({
 
   useEffect(() => {
     if (visible) {
-      opacity.value = withTiming(1, {duration: 150});
-      translateY.value = withTiming(0, {duration: 200});
+      opacity.value = withTiming(1, { duration: 150 });
+      translateY.value = withTiming(0, { duration: 200 });
     } else {
-      opacity.value = withTiming(0, {duration: 150});
-      translateY.value = withTiming(1000, {duration: 200});
+      opacity.value = withTiming(0, { duration: 150 });
+      translateY.value = withTiming(1000, { duration: 200 });
     }
   }, [visible, opacity, translateY]);
 
@@ -68,14 +74,27 @@ const TournamentFiltersSheet: React.FC<TournamentFiltersSheetProps> = ({
   }));
 
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: translateY.value}],
+    transform: [{ translateY: translateY.value }],
   }));
 
   return (
-    <Animated.View style={[styles.overlay, overlayStyle]} pointerEvents={visible ? 'auto' : 'none'}>
-      <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
-      
-      <Animated.View style={[styles.sheet, {paddingBottom: insets.bottom || Spacing.xl}, sheetStyle]}>
+    <Animated.View
+      style={[styles.overlay, overlayStyle]}
+      pointerEvents={visible ? 'auto' : 'none'}
+    >
+      <TouchableOpacity
+        style={styles.backdrop}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+
+      <Animated.View
+        style={[
+          styles.sheet,
+          { paddingBottom: insets.bottom || Spacing.xl },
+          sheetStyle,
+        ]}
+      >
         <View style={styles.header}>
           <Heading style={styles.headerTitle}>Filters</Heading>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -84,10 +103,26 @@ const TournamentFiltersSheet: React.FC<TournamentFiltersSheetProps> = ({
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <FilterSection title="Game" options={['All', 'PUBG', 'Valorant', 'Free Fire', 'COD']} selected="All" />
-          <FilterSection title="Status" options={['Upcoming', 'Live', 'Open', 'Completed']} selected="Open" />
-          <FilterSection title="Entry Fee" options={['Any', 'Free', 'Premium']} selected="Any" />
-          <FilterSection title="Prize Pool" options={['Any', 'High to Low', 'Low to High']} selected="High to Low" />
+          <FilterSection
+            title="Game"
+            options={['All', 'PUBG', 'Valorant', 'Free Fire', 'COD']}
+            selected="All"
+          />
+          <FilterSection
+            title="Status"
+            options={['Upcoming', 'Live', 'Open', 'Completed']}
+            selected="Open"
+          />
+          <FilterSection
+            title="Entry Fee"
+            options={['Any', 'Free', 'Premium']}
+            selected="Any"
+          />
+          <FilterSection
+            title="Prize Pool"
+            options={['Any', 'High to Low', 'Low to High']}
+            selected="High to Low"
+          />
         </ScrollView>
 
         <View style={styles.footer}>

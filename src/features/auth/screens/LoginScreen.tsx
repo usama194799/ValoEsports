@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,28 +8,28 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
 import AuthInput from '../components/AuthInput';
 import PasswordInput from '../components/PasswordInput';
 import AuthButton from '../components/AuthButton';
 import SocialButton from '../components/SocialButton';
-import {useAuth} from '../hooks/useAuth';
-import {authService} from '../services/authService';
+import { useAuth } from '../hooks/useAuth';
+import { authService } from '../services/authService';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
-  const {login} = useAuth();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +46,7 @@ const LoginScreen = () => {
 
     setIsLoading(true);
     try {
-      const {token, user} = await authService.login(email, password);
+      const { token, user } = await authService.login(email, password);
       await login(token, user);
       // AppNavigator will automatically switch to Main flow
     } catch (err: any) {
@@ -60,14 +60,19 @@ const LoginScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, {paddingTop: insets.top || Spacing.xl}]}
-        showsVerticalScrollIndicator={false}>
-        
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top || Spacing.xl },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
 
@@ -97,7 +102,8 @@ const LoginScreen = () => {
             <TouchableOpacity
               style={styles.rememberBtn}
               onPress={() => setRememberMe(!rememberMe)}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+            >
               <Icon
                 name={rememberMe ? 'checkbox-marked' : 'checkbox-blank-outline'}
                 size={20}
@@ -106,7 +112,9 @@ const LoginScreen = () => {
               <Label style={styles.rememberText}>Remember me</Label>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ForgotPassword')}
+            >
               <Label style={styles.forgotText}>Forgot Password?</Label>
             </TouchableOpacity>
           </View>

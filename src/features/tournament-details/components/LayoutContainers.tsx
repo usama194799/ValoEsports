@@ -1,19 +1,15 @@
 import React from 'react';
-import {StyleSheet, View, ViewProps} from 'react-native';
+import { StyleSheet, View, ViewProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Shadows} from '../../../theme/shadow';
-import {Spacing} from '../../../theme/spacing';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Shadows } from '../../../theme/shadow';
+import { Spacing } from '../../../theme/spacing';
 
-export const SectionContainer: React.FC<ViewProps & {title?: string; headerRight?: React.ReactNode}> = ({
-  children,
-  title,
-  headerRight,
-  style,
-  ...props
-}) => (
+export const SectionContainer: React.FC<
+  ViewProps & { title?: string; headerRight?: React.ReactNode }
+> = ({ children, title, headerRight, style, ...props }) => (
   <View style={[styles.sectionContainer, style]} {...props}>
     {(title || headerRight) && (
       <View style={styles.sectionHeader}>
@@ -25,13 +21,17 @@ export const SectionContainer: React.FC<ViewProps & {title?: string; headerRight
   </View>
 );
 
-export const CardContainer: React.FC<ViewProps> = ({children, style, ...props}) => (
+export const CardContainer: React.FC<ViewProps> = ({
+  children,
+  style,
+  ...props
+}) => (
   <View style={[styles.cardContainer, Shadows.card, style]} {...props}>
     {children}
   </View>
 );
 
-export const InfoRow: React.FC<ViewProps> = ({children, style, ...props}) => (
+export const InfoRow: React.FC<ViewProps> = ({ children, style, ...props }) => (
   <View style={[styles.infoRow, style]} {...props}>
     {children}
   </View>
@@ -44,28 +44,30 @@ interface InfoItemProps {
   highlight?: boolean;
 }
 
-export const InfoItem: React.FC<InfoItemProps> = React.memo(({icon, label, value, highlight}) => (
-  <View style={styles.infoItem}>
-    <View style={styles.iconWrapper}>
-      <Icon
-        name={icon}
-        size={20}
-        color={highlight ? Colors.gaming.rankGold : Colors.text.secondary}
-      />
+export const InfoItem: React.FC<InfoItemProps> = React.memo(
+  ({ icon, label, value, highlight }) => (
+    <View style={styles.infoItem}>
+      <View style={styles.iconWrapper}>
+        <Icon
+          name={icon}
+          size={20}
+          color={highlight ? Colors.gaming.rankGold : Colors.text.secondary}
+        />
+      </View>
+      <View style={styles.infoText}>
+        <Label style={styles.label} numberOfLines={1}>
+          {label}
+        </Label>
+        <Subheading
+          style={[styles.value, highlight && { color: Colors.gaming.rankGold }]}
+          // Removing numberOfLines to allow long values to wrap correctly per user request
+        >
+          {value}
+        </Subheading>
+      </View>
     </View>
-    <View style={styles.infoText}>
-      <Label style={styles.label} numberOfLines={1}>
-        {label}
-      </Label>
-      <Subheading
-        style={[styles.value, highlight && {color: Colors.gaming.rankGold}]}
-        // Removing numberOfLines to allow long values to wrap correctly per user request
-      >
-        {value}
-      </Subheading>
-    </View>
-  </View>
-));
+  ),
+);
 
 const styles = StyleSheet.create({
   sectionContainer: {

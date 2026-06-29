@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View, BackHandler} from 'react-native';
-import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, BackHandler } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,10 +9,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {Heading, Label} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { Heading, Label } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
 import AuthButton from '../components/AuthButton';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Success'>;
@@ -21,28 +21,31 @@ type SuccessRouteProp = RouteProp<AuthStackParamList, 'Success'>;
 const SuccessScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<SuccessRouteProp>();
-  const {title, message} = route.params;
+  const { title, message } = route.params;
 
   const scale = useSharedValue(0.9);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     // Disable back button
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
-    
-    scale.value = withTiming(1, {duration: 200});
-    opacity.value = withTiming(1, {duration: 300});
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    );
+
+    scale.value = withTiming(1, { duration: 200 });
+    opacity.value = withTiming(1, { duration: 300 });
 
     return () => backHandler.remove();
   }, [opacity, scale]);
 
   const animatedIconStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
+    transform: [{ scale: scale.value }],
   }));
 
   const animatedTextStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{translateY: withTiming(opacity.value === 1 ? 0 : 20)}],
+    transform: [{ translateY: withTiming(opacity.value === 1 ? 0 : 20) }],
   }));
 
   return (
@@ -88,13 +91,13 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(0, 200, 83, 0.1)',
+    backgroundColor: Colors.success.transparent.light,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: Colors.success.main,
     shadowColor: Colors.success.main,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 10,

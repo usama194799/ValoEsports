@@ -1,31 +1,44 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View, Linking, Alert} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Linking,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {SocialLink} from '../types/profile';
+import { Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { SocialLink } from '../types/profile';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 interface SocialLinkRowProps {
   social: SocialLink;
 }
 
-const SocialLinkRow: React.FC<SocialLinkRowProps> = ({social}) => {
+const SocialLinkRow: React.FC<SocialLinkRowProps> = ({ social }) => {
   const getSocialConfig = () => {
     switch (social.platform) {
-      case 'discord': return {icon: 'discord', color: '#5865F2', name: 'Discord'};
-      case 'youtube': return {icon: 'youtube', color: '#FF0000', name: 'YouTube'};
-      case 'twitter': return {icon: 'twitter', color: '#1DA1F2', name: 'X (Twitter)'};
-      case 'twitch': return {icon: 'twitch', color: '#9146FF', name: 'Twitch'};
-      case 'instagram': return {icon: 'instagram', color: '#E1306C', name: 'Instagram'};
-      case 'facebook': return {icon: 'facebook', color: '#1877F2', name: 'Facebook'};
-      default: return {icon: 'link', color: Colors.text.primary, name: 'Link'};
+      case 'discord':
+        return { icon: 'discord', color: '#5865F2', name: 'Discord' };
+      case 'youtube':
+        return { icon: 'youtube', color: '#FF0000', name: 'YouTube' };
+      case 'twitter':
+        return { icon: 'twitter', color: '#1DA1F2', name: 'X (Twitter)' };
+      case 'twitch':
+        return { icon: 'twitch', color: '#9146FF', name: 'Twitch' };
+      case 'instagram':
+        return { icon: 'instagram', color: '#E1306C', name: 'Instagram' };
+      case 'facebook':
+        return { icon: 'facebook', color: '#1877F2', name: 'Facebook' };
+      default:
+        return { icon: 'link', color: Colors.text.primary, name: 'Link' };
     }
   };
 
-  const {icon, color, name} = getSocialConfig();
+  const { icon, color, name } = getSocialConfig();
 
   const handlePress = () => {
     if (social.url) {
@@ -46,8 +59,9 @@ const SocialLinkRow: React.FC<SocialLinkRowProps> = ({social}) => {
       <TouchableOpacity
         style={styles.mainContent}
         onPress={handlePress}
-        activeOpacity={0.7}>
-        <View style={[styles.iconWrapper, {backgroundColor: color + '20'}]}>
+        activeOpacity={0.7}
+      >
+        <View style={[styles.iconWrapper, { backgroundColor: color + '20' }]}>
           <Icon name={icon} size={20} color={color} />
         </View>
         <View style={styles.textContainer}>
@@ -59,7 +73,8 @@ const SocialLinkRow: React.FC<SocialLinkRowProps> = ({social}) => {
       <TouchableOpacity
         style={styles.copyBtn}
         onPress={handleCopy}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <Icon name="content-copy" size={20} color={Colors.text.muted} />
       </TouchableOpacity>
     </View>

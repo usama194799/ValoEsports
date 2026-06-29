@@ -1,18 +1,18 @@
-import React, {useEffect, useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Tournament} from '../types';
+import { Tournament } from '../types';
 import LocationBadge from './LocationBadge';
 import GameBadge from './GameBadge';
 import OpenBadge from './OpenBadge';
 import LiveBadge from './LiveBadge';
-import {Caption, Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
+import { Caption, Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
 import AnimatedPressable from './AnimatedPressable';
 
 interface TournamentCardProps {
@@ -24,49 +24,53 @@ interface TournamentCardProps {
 const CARD_WIDTH = wp(178);
 const IMAGE_HEIGHT = wp(106);
 
-const TournamentCard: React.FC<TournamentCardProps> = ({item, index, onPress}) => {
-  const imageSource = useMemo(() => ({uri: item.image}), [item.image]);
+const TournamentCard: React.FC<TournamentCardProps> = ({
+  item,
+  index,
+  onPress,
+}) => {
+  const imageSource = useMemo(() => ({ uri: item.image }), [item.image]);
 
   return (
     <AnimatedPressable onPress={onPress} style={[styles.card, Shadows.card]}>
-        {/* Image */}
-        <View style={styles.imageContainer}>
-          <Animated.Image
-            sharedTransitionTag={`tournament-image-${item.id}`}
-            source={imageSource}
-            style={styles.image}
-            resizeMode="cover"
-          />
-          {/* LIVE Badge top-right */}
-          <View style={styles.liveBadgeContainer}>
-            <LiveBadge />
-          </View>
+      {/* Image */}
+      <View style={styles.imageContainer}>
+        <Animated.Image
+          sharedTransitionTag={`tournament-image-${item.id}`}
+          source={imageSource}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        {/* LIVE Badge top-right */}
+        <View style={styles.liveBadgeContainer}>
+          <LiveBadge />
+        </View>
+      </View>
+
+      {/* Info */}
+      <View style={styles.info}>
+        {/* Badges Row */}
+        <View style={styles.badgesRow}>
+          <LocationBadge locationName={item.location} />
+          <GameBadge gameName={`✕ ${item.mode}`} />
+          <OpenBadge label={`${item.slots} slots`} />
         </View>
 
-        {/* Info */}
-        <View style={styles.info}>
-          {/* Badges Row */}
-          <View style={styles.badgesRow}>
-            <LocationBadge locationName={item.location} />
-            <GameBadge gameName={`✕ ${item.mode}`} />
-            <OpenBadge label={`${item.slots} slots`} />
-          </View>
+        {/* Tournament Name */}
+        <Caption style={styles.name} numberOfLines={1}>
+          {item.name}
+        </Caption>
 
-          {/* Tournament Name */}
-          <Caption style={styles.name} numberOfLines={1}>
-            {item.name}
-          </Caption>
-
-          {/* Date & Time */}
-          <View style={styles.dateRow}>
-            <Icon name="calendar-outline" size={10} color={Colors.text.muted} />
-            <Label style={styles.dateText}>{item.date}</Label>
-            <Label style={styles.separator}>•</Label>
-            <Icon name="clock-outline" size={10} color={Colors.text.muted} />
-            <Label style={styles.dateText}>{item.time}</Label>
-          </View>
+        {/* Date & Time */}
+        <View style={styles.dateRow}>
+          <Icon name="calendar-outline" size={10} color={Colors.text.muted} />
+          <Label style={styles.dateText}>{item.date}</Label>
+          <Label style={styles.separator}>•</Label>
+          <Icon name="clock-outline" size={10} color={Colors.text.muted} />
+          <Label style={styles.dateText}>{item.time}</Label>
         </View>
-      </AnimatedPressable>
+      </View>
+    </AnimatedPressable>
   );
 };
 
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: '700',
     fontSize: 11,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   dateRow: {
     flexDirection: 'row',
@@ -125,4 +129,3 @@ const styles = StyleSheet.create({
 });
 
 export default React.memo(TournamentCard);
-

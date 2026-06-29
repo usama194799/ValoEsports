@@ -1,6 +1,6 @@
 import React from 'react';
-import {Platform} from 'react-native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { Platform } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // We'll create these screens next
 import SplashScreen from '../screens/SplashScreen';
@@ -20,20 +20,21 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  OTPVerification: {email: string; intent: 'register' | 'reset'};
-  ResetPassword: {email: string; code: string};
-  Success: {title: string; message: string};
+  OTPVerification: { email: string; intent: 'register' | 'reset' };
+  ResetPassword: { email: string; code: string };
+  Success: { title: string; message: string };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export const AuthNavigator = () => {
   return (
-    <Stack.Navigator 
+    <Stack.Navigator
       screenOptions={{
         headerShown: false,
         animation: Platform.OS === 'android' ? 'slide_from_right' : 'default',
-      }}>
+      }}
+    >
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

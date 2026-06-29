@@ -1,12 +1,12 @@
 import React from 'react';
-import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Animated, {FadeInDown} from 'react-native-reanimated';
-import {Team} from '../types/team';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Team } from '../types/team';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
 
 interface TeamCardProps {
   team: Team;
@@ -14,19 +14,23 @@ interface TeamCardProps {
   onPress: () => void;
 }
 
-const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
+const TeamCard: React.FC<TeamCardProps> = ({ team, index, onPress }) => {
   return (
-    <View style={styles.cardContainer}>
+    <View style={styles.card}>
       <View style={styles.card}>
         <View style={styles.header}>
-          <Image source={{uri: team.logoUrl}} style={styles.logo} />
+          <Image source={{ uri: team.logoUrl }} style={styles.logo} />
           <View style={styles.headerInfo}>
             <View style={styles.titleRow}>
               <Heading style={styles.teamName} numberOfLines={1}>
                 {team.name}
               </Heading>
               {team.rank <= 3 && (
-                <Icon name="medal-outline" size={16} color={Colors.gaming.rankGold} />
+                <Icon
+                  name="medal-outline"
+                  size={16}
+                  color={Colors.gaming.rankGold}
+                />
               )}
             </View>
             <View style={styles.subtitleRow}>
@@ -55,7 +59,9 @@ const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Subheading style={[styles.statValue, {color: Colors.gaming.winRate}]}>
+            <Subheading
+              style={[styles.statValue, { color: Colors.success.main }]}
+            >
               {Math.round((team.wins / (team.wins + team.losses)) * 100)}%
             </Subheading>
             <Label style={styles.statLabel}>Win Rate</Label>
@@ -64,7 +70,11 @@ const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
 
         {team.activeTournament && (
           <View style={styles.tournamentRow}>
-            <Icon name="trophy-variant-outline" size={16} color={Colors.gaming.rankSilver} />
+            <Icon
+              name="trophy-variant-outline"
+              size={16}
+              color={Colors.gaming.rankSilver}
+            />
             <Label style={styles.activeTournament} numberOfLines={1}>
               {team.activeTournament}
             </Label>
@@ -74,7 +84,8 @@ const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
         <TouchableOpacity
           style={styles.detailsBtn}
           activeOpacity={0.8}
-          onPress={onPress}>
+          onPress={onPress}
+        >
           <Label style={styles.detailsText}>View Details</Label>
         </TouchableOpacity>
       </View>
@@ -163,7 +174,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 16,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   statLabel: {
     fontSize: 11,

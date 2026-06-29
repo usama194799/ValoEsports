@@ -1,5 +1,5 @@
-import React, {useMemo} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Extrapolation,
   SharedValue,
@@ -8,15 +8,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {Heading, Subheading} from '../../../components/Typography';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { Heading, Subheading } from '../../../components/Typography';
 import BadgeChip from '../../../components/BadgeChip';
 import LiveBadge from '../../../components/LiveBadge';
 import OpenBadge from '../../../components/OpenBadge';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {wp} from '../../../utils/responsive';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { wp } from '../../../utils/responsive';
 
 interface HeroBannerProps {
   banner: string;
@@ -46,7 +46,10 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
 
   // The height when fully collapsed (Safe Area + generic navbar height)
   const HEADER_MIN_HEIGHT = useMemo(() => insets.top + 60, [insets.top]);
-  const SCROLL_DISTANCE = useMemo(() => HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT, [HEADER_MIN_HEIGHT]);
+  const SCROLL_DISTANCE = useMemo(
+    () => HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT,
+    [HEADER_MIN_HEIGHT],
+  );
 
   const containerStyle = useAnimatedStyle(() => {
     // Container translates up as we scroll, but stops at -SCROLL_DISTANCE to remain sticky
@@ -56,7 +59,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       [0, 0, -SCROLL_DISTANCE, -SCROLL_DISTANCE],
     );
     return {
-      transform: [{translateY}],
+      transform: [{ translateY }],
     };
   });
 
@@ -76,7 +79,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       Extrapolation.CLAMP,
     );
     return {
-      transform: [{translateY}, {scale}],
+      transform: [{ translateY }, { scale }],
     };
   });
 
@@ -87,7 +90,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       [1, 0],
       Extrapolation.CLAMP,
     );
-    return {opacity};
+    return { opacity };
   });
 
   const headerBgStyle = useAnimatedStyle(() => {
@@ -120,7 +123,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
     <Animated.View style={[styles.container, containerStyle]}>
       <Animated.View style={[styles.imageContainer, imageStyle]}>
         <Animated.Image
-          source={{uri: banner}}
+          source={{ uri: banner }}
           style={styles.image}
           resizeMode="cover"
         />
@@ -133,20 +136,31 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       </Animated.View>
 
       {/* Floating Header Actions (Pinned to the top of the container) */}
-      <View style={[styles.headerActions, {paddingTop: insets.top + Spacing.sm}]}>
+      <View
+        style={[styles.headerActions, { paddingTop: insets.top + Spacing.sm }]}
+      >
         <Animated.View style={[StyleSheet.absoluteFill, headerBgStyle]} />
         <TouchableOpacity
           style={styles.iconBtn}
           onPress={() => navigation.goBack()}
-          activeOpacity={0.8}>
+          activeOpacity={0.8}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
-        
+
         <View style={styles.rightActions}>
-          <TouchableOpacity style={styles.iconBtn} onPress={onShare} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={onShare}
+            activeOpacity={0.8}
+          >
             <Icon name="share-variant" size={22} color={Colors.text.primary} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn} onPress={onFavorite} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={onFavorite}
+            activeOpacity={0.8}
+          >
             <Icon
               name={isFavorite ? 'cards-heart' : 'cards-heart-outline'}
               size={24}
@@ -159,7 +173,9 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       {/* Details Content */}
       <Animated.View style={[styles.content, contentOpacity]}>
         <View style={styles.badgeWrapper}>{renderBadge()}</View>
-        <Heading style={styles.title} numberOfLines={2}>{name}</Heading>
+        <Heading style={styles.title} numberOfLines={2}>
+          {name}
+        </Heading>
         <View style={styles.orgWrapper}>
           <Subheading style={styles.orgText}>By {organizerName}</Subheading>
           <Icon name="check-decagram" size={16} color={Colors.primary.main} />
@@ -205,7 +221,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.sm,
     zIndex: 20,
     // Provide a minimum height area so touches work
-    height: 100, 
+    height: 100,
   },
   rightActions: {
     flexDirection: 'row',
@@ -215,7 +231,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: Colors.neutral.blackTransparent.light,
     alignItems: 'center',
     justifyContent: 'center',
   },

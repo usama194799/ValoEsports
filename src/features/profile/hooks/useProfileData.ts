@@ -1,6 +1,6 @@
-import {useState, useEffect, useCallback} from 'react';
-import {PlayerProfile} from '../types/profile';
-import {DUMMY_PROFILE} from '../constants/dummyData';
+import { useState, useEffect, useCallback } from 'react';
+import { PlayerProfile } from '../types/profile';
+import { DUMMY_PROFILE } from '../constants/dummyData';
 
 export const useProfileData = () => {
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
@@ -37,10 +37,10 @@ export const useProfileData = () => {
     try {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setProfile(prev => {
         if (!prev) return prev;
-        return {...prev, ...updates};
+        return { ...prev, ...updates };
       });
       return true;
     } catch (err) {

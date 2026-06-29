@@ -7,7 +7,7 @@ import {
   Notification,
   HeroBannerData,
 } from '../types';
-import {Images} from '../theme/images';
+import { Images } from '../theme/images';
 
 export const db = {
   profile: {

@@ -1,13 +1,13 @@
 import React from 'react';
-import {StyleSheet, ScrollView, View} from 'react-native';
-import Animated, {FadeInRight} from 'react-native-reanimated';
+import { StyleSheet, ScrollView, View } from 'react-native';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {PrizeReward} from '../types';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {SectionContainer, CardContainer} from './LayoutContainers';
+import { PrizeReward } from '../types';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { SectionContainer, CardContainer } from './LayoutContainers';
 
 interface PrizeDistributionProps {
   prizes: PrizeReward[];
@@ -26,21 +26,23 @@ const getRankColor = (position: number) => {
   }
 };
 
-const PrizeDistribution: React.FC<PrizeDistributionProps> = ({prizes}) => {
+const PrizeDistribution: React.FC<PrizeDistributionProps> = ({ prizes }) => {
   return (
     <SectionContainer title="Prize Distribution">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+      >
         {prizes.map((prize, index) => (
           <View key={index}>
             <CardContainer style={styles.card}>
               <View
                 style={[
                   styles.rankBadge,
-                  {backgroundColor: getRankColor(prize.position)},
-                ]}>
+                  { backgroundColor: getRankColor(prize.position) },
+                ]}
+              >
                 <Label style={styles.rankText}>#{prize.position}</Label>
               </View>
 
@@ -97,7 +99,7 @@ const styles = StyleSheet.create({
   amount: {
     color: Colors.gaming.rankGold,
     fontSize: 18,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   type: {
     color: Colors.text.muted,

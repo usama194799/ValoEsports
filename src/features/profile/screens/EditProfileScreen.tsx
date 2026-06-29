@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,15 +10,15 @@ import {
   ImageBackground,
   Image,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {useProfileData} from '../hooks/useProfileData';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { useProfileData } from '../hooks/useProfileData';
 
 // Re-using Auth components for inputs and buttons (assuming they are generic enough)
 import AuthInput from '../../auth/components/AuthInput';
@@ -27,7 +27,7 @@ import AuthButton from '../../auth/components/AuthButton';
 const EditProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const {profile, updateProfile, isLoading} = useProfileData();
+  const { profile, updateProfile, isLoading } = useProfileData();
 
   const [form, setForm] = useState({
     fullName: '',
@@ -57,7 +57,7 @@ const EditProfileScreen = () => {
     setIsSaving(true);
     const success = await updateProfile(form);
     setIsSaving(false);
-    
+
     if (success) {
       navigation.goBack();
     } else {
@@ -68,22 +68,28 @@ const EditProfileScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Edit Profile</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Cover & Avatar Edit */}
         <View style={styles.mediaContainer}>
           <ImageBackground
-            source={{uri: profile?.coverUrl || 'https://via.placeholder.com/1024x400'}}
-            style={styles.coverImage}>
+            source={{
+              uri: profile?.coverUrl || 'https://via.placeholder.com/1024x400',
+            }}
+            style={styles.coverImage}
+          >
             <View style={styles.overlay} />
             <TouchableOpacity style={styles.cameraBtn}>
               <Icon name="camera" size={20} color="#FFF" />
@@ -92,10 +98,14 @@ const EditProfileScreen = () => {
 
           <View style={styles.avatarContainer}>
             <Image
-              source={{uri: profile?.avatarUrl || 'https://via.placeholder.com/256'}}
+              source={{
+                uri: profile?.avatarUrl || 'https://via.placeholder.com/256',
+              }}
               style={styles.avatarImage}
             />
-            <TouchableOpacity style={[styles.cameraBtn, styles.avatarCameraBtn]}>
+            <TouchableOpacity
+              style={[styles.cameraBtn, styles.avatarCameraBtn]}
+            >
               <Icon name="camera" size={16} color="#FFF" />
             </TouchableOpacity>
           </View>
@@ -105,40 +115,44 @@ const EditProfileScreen = () => {
           <AuthInput
             label="Full Name"
             value={form.fullName}
-            onChangeText={(v) => setForm(f => ({...f, fullName: v}))}
+            onChangeText={v => setForm(f => ({ ...f, fullName: v }))}
             leftIcon="account-outline"
           />
           <AuthInput
             label="Username"
             value={form.username}
-            onChangeText={(v) => setForm(f => ({...f, username: v}))}
+            onChangeText={v => setForm(f => ({ ...f, username: v }))}
             leftIcon="at"
             autoCapitalize="none"
           />
           <AuthInput
             label="Bio"
             value={form.bio}
-            onChangeText={(v) => setForm(f => ({...f, bio: v}))}
+            onChangeText={v => setForm(f => ({ ...f, bio: v }))}
             leftIcon="card-text-outline"
             multiline
-            style={{height: 100, textAlignVertical: 'top', paddingTop: Spacing.md}}
+            style={{
+              height: 100,
+              textAlignVertical: 'top',
+              paddingTop: Spacing.md,
+            }}
           />
           <AuthInput
             label="Country"
             value={form.country}
-            onChangeText={(v) => setForm(f => ({...f, country: v}))}
+            onChangeText={v => setForm(f => ({ ...f, country: v }))}
             leftIcon="map-marker-outline"
           />
           <AuthInput
             label="Language"
             value={form.language}
-            onChangeText={(v) => setForm(f => ({...f, language: v}))}
+            onChangeText={v => setForm(f => ({ ...f, language: v }))}
             leftIcon="web"
           />
           <AuthInput
             label="Favourite Game"
             value={form.favouriteGame}
-            onChangeText={(v) => setForm(f => ({...f, favouriteGame: v}))}
+            onChangeText={v => setForm(f => ({ ...f, favouriteGame: v }))}
             leftIcon="gamepad-variant-outline"
           />
 
@@ -147,7 +161,7 @@ const EditProfileScreen = () => {
               label="Save Changes"
               onPress={handleSave}
               loading={isSaving}
-              style={{marginBottom: Spacing.sm}}
+              style={{ marginBottom: Spacing.sm }}
             />
             <AuthButton
               label="Discard"
@@ -194,14 +208,14 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    ...(StyleSheet.absoluteFill as any),
+    backgroundColor: Colors.neutral.blackTransparent.light,
   },
   cameraBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: Colors.neutral.blackTransparent.medium,
     alignItems: 'center',
     justifyContent: 'center',
   },

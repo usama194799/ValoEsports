@@ -1,10 +1,10 @@
-import React, {useEffect, useMemo} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
-import {Heading, Label, Subheading, Caption} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
+import React, { useEffect, useMemo } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
+import { Heading, Label, Subheading, Caption } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
 
 interface LeaderboardCardProps {
   item: LeaderPlayer;
@@ -17,7 +17,7 @@ const rankColors: Record<number, string> = {
   3: Colors.gaming.rankBronze,
 };
 
-const LeaderboardCard: React.FC<LeaderboardCardProps> = ({item, index}) => {
+const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ item, index }) => {
   const rankColor = rankColors[item.rank] ?? Colors.text.secondary;
 
   const formattedPoints =
@@ -25,18 +25,14 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({item, index}) => {
       ? `${(item.points / 1000).toFixed(1)}k`
       : `${item.points}`;
 
-  const imageSource = useMemo(() => ({uri: item.avatar}), [item.avatar]);
+  const imageSource = useMemo(() => ({ uri: item.avatar }), [item.avatar]);
 
   return (
     <View style={[styles.card, Shadows.card]}>
       {/* Avatar with rank badge */}
       <View style={styles.avatarContainer}>
-        <Image
-          source={imageSource}
-          style={styles.avatar}
-          resizeMode="cover"
-        />
-        <View style={[styles.rankBadge, {backgroundColor: rankColor}]}>
+        <Image source={imageSource} style={styles.avatar} resizeMode="cover" />
+        <View style={[styles.rankBadge, { backgroundColor: rankColor }]}>
           <Label style={styles.rankText}>{item.rank}</Label>
         </View>
       </View>
@@ -50,7 +46,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({item, index}) => {
       {/* Stats */}
       <View style={styles.stats}>
         <View style={styles.statCol}>
-          <Heading style={styles.statValue} color={Colors.primary.main}>{formattedPoints}</Heading>
+          <Heading style={styles.statValue} color={Colors.primary.main}>
+            {formattedPoints}
+          </Heading>
           <Label style={styles.statLabel}>Points</Label>
         </View>
         <View style={styles.statCol}>
@@ -134,4 +132,3 @@ const styles = StyleSheet.create({
 });
 
 export default React.memo(LeaderboardCard);
-

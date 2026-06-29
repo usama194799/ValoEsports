@@ -1,20 +1,20 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
 import {
-  FlatList,
   RefreshControl,
   StyleSheet,
   View,
   TouchableOpacity,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../navigation/types';
-import {ROUTES} from '../navigation/routes';
-import {Tournament} from '../types';
-import {playerService} from '../services'; // We will just use playerService or a mocked fetch for tournaments
-import {db} from '../data/db'; // Direct access for mock
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { ROUTES } from '../navigation/routes';
+import { Tournament } from '../types';
+import { playerService } from '../services'; // We will just use playerService or a mocked fetch for tournaments
+import { db } from '../data/db'; // Direct access for mock
 import SearchHeader from '../components/SearchHeader';
 import CategoryChips from '../components/CategoryChips';
 import TournamentListCard from '../components/TournamentListCard';
@@ -22,12 +22,27 @@ import TournamentFiltersSheet from '../components/TournamentFiltersSheet';
 import SkeletonCard from '../components/SkeletonCard';
 import EmptyState from '../components/EmptyState';
 import NoInternetState from '../components/NoInternetState';
-import {Heading, Label} from '../components/Typography';
-import {Colors} from '../theme/colors';
-import {Spacing} from '../theme/spacing';
+import { Heading, Label } from '../components/Typography';
+import { Colors } from '../theme/colors';
+import { Spacing } from '../theme/spacing';
 
-const CATEGORIES = ['All', 'Valorant', 'PUBG', 'BGMI', 'COD', 'Free Fire', 'CS2'];
-const SORT_OPTIONS = ['Newest', 'Popular', 'Highest Prize', 'Closing Soon', 'Free Entry', 'Premium'];
+const CATEGORIES = [
+  'All',
+  'Valorant',
+  'PUBG',
+  'BGMI',
+  'COD',
+  'Free Fire',
+  'CS2',
+];
+const SORT_OPTIONS = [
+  'Newest',
+  'Popular',
+  'Highest Prize',
+  'Closing Soon',
+  'Free Entry',
+  'Premium',
+];
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -40,33 +55,38 @@ const TournamentScreen: React.FC = () => {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('Newest');
-  
+
   const [filterVisible, setFilterVisible] = useState(false);
   const [networkError, setNetworkError] = useState(false);
 
-  const fetchTournaments = useCallback(async (isRefresh = false) => {
-    try {
-      if (!isRefresh) setLoading(true);
-      setNetworkError(false);
-      
-      // Simulate API call
-      await new Promise<void>(resolve => setTimeout(resolve, 1000));
-      
-      let data = [...db.tournaments];
-      
-      // Category Filter
-      if (category !== 'All') {
-        data = data.filter(t => t.gameName.toLowerCase().includes(category.toLowerCase()));
+  const fetchTournaments = useCallback(
+    async (isRefresh = false) => {
+      try {
+        if (!isRefresh) setLoading(true);
+        setNetworkError(false);
+
+        // Simulate API call
+        await new Promise<void>(resolve => setTimeout(resolve, 1000));
+
+        let data = [...db.tournaments];
+
+        // Category Filter
+        if (category !== 'All') {
+          data = data.filter(t =>
+            t.gameName.toLowerCase().includes(category.toLowerCase()),
+          );
+        }
+
+        setTournaments(data);
+      } catch (e) {
+        setNetworkError(true);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      
-      setTournaments(data);
-    } catch (e) {
-      setNetworkError(true);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [category]);
+    },
+    [category],
+  );
 
   useEffect(() => {
     fetchTournaments();
@@ -81,24 +101,37 @@ const TournamentScreen: React.FC = () => {
     navigation.navigate(ROUTES.SEARCH);
   }, [navigation]);
 
-  const renderItem = useCallback(({item, index}: {item: Tournament; index: number}) => {
-    return (
-      <TournamentListCard
-        item={item}
-        index={index}
-        onPress={() => navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {tournamentId: item.id})}
-      />
-    );
-  }, [navigation]);
+  const renderItem = useCallback(
+    ({ item, index }: { item: Tournament; index: number }) => {
+      return (
+        <TournamentListCard
+          item={item}
+          index={index}
+          onPress={() =>
+            navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {
+              tournamentId: item.id,
+            })
+          }
+        />
+      );
+    },
+    [navigation],
+  );
 
   const renderEmpty = useCallback(() => {
     if (loading) return null;
-    if (networkError) return <NoInternetState onRetry={() => fetchTournaments()} />;
-    return <EmptyState title="No Tournaments Found" message="Try adjusting your filters or search criteria." />;
+    if (networkError)
+      return <NoInternetState onRetry={() => fetchTournaments()} />;
+    return (
+      <EmptyState
+        title="No Tournaments Found"
+        message="Try adjusting your filters or search criteria."
+      />
+    );
   }, [loading, networkError, fetchTournaments]);
 
   return (
-    <View style={[styles.root, {paddingTop: insets.top}]}>
+    <View style={[styles.root, { paddingTop: insets.top }]}>
       {/* Header */}
       <SearchHeader
         editable={false}
@@ -121,14 +154,16 @@ const TournamentScreen: React.FC = () => {
           <Label style={styles.sortLabel}>Sort: {sort}</Label>
           <Icon name="chevron-down" size={16} color={Colors.text.primary} />
         </TouchableOpacity>
-        
-        <TouchableOpacity onPress={() => setFilterVisible(true)} style={styles.filterBtn}>
+
+        <TouchableOpacity
+          onPress={() => setFilterVisible(true)}
+          style={styles.filterBtn}
+        >
           <Icon name="tune-variant" size={18} color={Colors.text.primary} />
           <Label style={styles.filterLabel}>Filters</Label>
         </TouchableOpacity>
       </View>
 
-      {/* List */}
       {loading && !refreshing ? (
         <View style={styles.listContent}>
           <SkeletonCard index={0} />
@@ -136,27 +171,25 @@ const TournamentScreen: React.FC = () => {
           <SkeletonCard index={2} />
         </View>
       ) : (
-        <FlatList
-          data={tournaments}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={renderEmpty}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={Colors.primary.main}
-              colors={[Colors.primary.main]}
-            />
-          }
-          // Performance optimizations
-          initialNumToRender={5}
-          maxToRenderPerBatch={5}
-          windowSize={5}
-          removeClippedSubviews={true}
-        />
+        <View style={{ flex: 1 }}>
+          <FlashList
+            data={tournaments}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={renderEmpty}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={Colors.primary.main}
+                colors={[Colors.primary.main]}
+              />
+            }
+            estimatedItemSize={250}
+          />
+        </View>
       )}
 
       {/* Filter Bottom Sheet */}

@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,16 +8,16 @@ import Animated, {
   withTiming,
   withDelay,
 } from 'react-native-reanimated';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
 
 interface SkeletonCardProps {
   index?: number;
 }
 
-const SkeletonCard: React.FC<SkeletonCardProps> = ({index = 0}) => {
+const SkeletonCard: React.FC<SkeletonCardProps> = ({ index = 0 }) => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
@@ -25,8 +25,8 @@ const SkeletonCard: React.FC<SkeletonCardProps> = ({index = 0}) => {
       index * 100,
       withRepeat(
         withSequence(
-          withTiming(0.7, {duration: 800}),
-          withTiming(0.3, {duration: 800}),
+          withTiming(0.7, { duration: 800 }),
+          withTiming(0.3, { duration: 800 }),
         ),
         -1,
         true,
@@ -42,7 +42,7 @@ const SkeletonCard: React.FC<SkeletonCardProps> = ({index = 0}) => {
     <Animated.View style={[styles.container, animatedStyle]}>
       {/* Banner Skeleton */}
       <View style={styles.banner} />
-      
+
       {/* Content Skeleton */}
       <View style={styles.content}>
         {/* Title */}

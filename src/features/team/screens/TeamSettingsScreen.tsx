@@ -1,22 +1,29 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, ScrollView, TouchableOpacity, Alert} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {ROUTES} from '../../../navigation/routes';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../../navigation/types';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { ROUTES } from '../../../navigation/routes';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../navigation/types';
 
 const TeamSettingsScreen = () => {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<any>();
-  
+
   const teamId = route.params?.teamId;
 
   const handleDisband = useCallback(() => {
@@ -24,41 +31,56 @@ const TeamSettingsScreen = () => {
       'Disband Team',
       'Are you sure you want to disband this team? This action cannot be undone and all data will be lost.',
       [
-        {text: 'Cancel', style: 'cancel'},
-        {text: 'Disband', style: 'destructive', onPress: () => navigation.navigate(ROUTES.MY_TEAMS as any)},
-      ]
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disband',
+          style: 'destructive',
+          onPress: () => navigation.navigate(ROUTES.MY_TEAMS as any),
+        },
+      ],
     );
   }, [navigation]);
 
   const handleLeave = useCallback(() => {
-    Alert.alert(
-      'Leave Team',
-      'Are you sure you want to leave this team?',
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {text: 'Leave', style: 'destructive', onPress: () => navigation.navigate(ROUTES.MY_TEAMS as any)},
-      ]
-    );
+    Alert.alert('Leave Team', 'Are you sure you want to leave this team?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Leave',
+        style: 'destructive',
+        onPress: () => navigation.navigate(ROUTES.MY_TEAMS as any),
+      },
+    ]);
   }, [navigation]);
 
   return (
     <View style={styles.root}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Team Settings</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        
         <View style={styles.section}>
           <Label style={styles.sectionTitle}>Management</Label>
           <View style={styles.card}>
-            <TouchableOpacity style={styles.row} onPress={() => navigation.navigate(ROUTES.TEAM_REQUESTS, {teamId})}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() =>
+                navigation.navigate(ROUTES.TEAM_REQUESTS, { teamId })
+              }
+            >
               <View style={styles.rowIcon}>
-                <Icon name="inbox-outline" size={22} color={Colors.text.primary} />
+                <Icon
+                  name="inbox-outline"
+                  size={22}
+                  color={Colors.text.primary}
+                />
               </View>
               <Subheading style={styles.rowText}>Join Requests</Subheading>
               <View style={styles.badge}>
@@ -66,22 +88,38 @@ const TeamSettingsScreen = () => {
               </View>
               <Icon name="chevron-right" size={24} color={Colors.text.muted} />
             </TouchableOpacity>
-            
+
             <View style={styles.divider} />
-            
-            <TouchableOpacity style={styles.row} onPress={() => navigation.navigate(ROUTES.EDIT_TEAM, {teamId})}>
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => navigation.navigate(ROUTES.EDIT_TEAM, { teamId })}
+            >
               <View style={styles.rowIcon}>
-                <Icon name="pencil-outline" size={22} color={Colors.text.primary} />
+                <Icon
+                  name="pencil-outline"
+                  size={22}
+                  color={Colors.text.primary}
+                />
               </View>
               <Subheading style={styles.rowText}>Edit Team Profile</Subheading>
               <Icon name="chevron-right" size={24} color={Colors.text.muted} />
             </TouchableOpacity>
 
             <View style={styles.divider} />
-            
-            <TouchableOpacity style={styles.row} onPress={() => navigation.navigate(ROUTES.TEAM_MEMBERS, {teamId})}>
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() =>
+                navigation.navigate(ROUTES.TEAM_MEMBERS, { teamId })
+              }
+            >
               <View style={styles.rowIcon}>
-                <Icon name="account-group-outline" size={22} color={Colors.text.primary} />
+                <Icon
+                  name="account-group-outline"
+                  size={22}
+                  color={Colors.text.primary}
+                />
               </View>
               <Subheading style={styles.rowText}>Manage Members</Subheading>
               <Icon name="chevron-right" size={24} color={Colors.text.muted} />
@@ -96,20 +134,31 @@ const TeamSettingsScreen = () => {
               <View style={styles.rowIcon}>
                 <Icon name="exit-run" size={22} color={Colors.danger.main} />
               </View>
-              <Subheading style={[styles.rowText, {color: Colors.danger.main}]}>Leave Team</Subheading>
+              <Subheading
+                style={[styles.rowText, { color: Colors.danger.main }]}
+              >
+                Leave Team
+              </Subheading>
             </TouchableOpacity>
 
             <View style={styles.divider} />
-            
+
             <TouchableOpacity style={styles.row} onPress={handleDisband}>
               <View style={styles.rowIcon}>
-                <Icon name="delete-outline" size={22} color={Colors.danger.main} />
+                <Icon
+                  name="delete-outline"
+                  size={22}
+                  color={Colors.danger.main}
+                />
               </View>
-              <Subheading style={[styles.rowText, {color: Colors.danger.main}]}>Disband Team</Subheading>
+              <Subheading
+                style={[styles.rowText, { color: Colors.danger.main }]}
+              >
+                Disband Team
+              </Subheading>
             </TouchableOpacity>
           </View>
         </View>
-
       </ScrollView>
     </View>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
@@ -8,10 +8,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {Heading, Label, Subheading} from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { Heading, Label, Subheading } from '../../../components/Typography';
 
 const BANNER_HEIGHT = 220;
 
@@ -44,14 +44,14 @@ const TeamBanner: React.FC<TeamBannerProps> = ({
       Extrapolate.CLAMP,
     );
     return {
-      transform: [{translateY}, {scale}],
+      transform: [{ translateY }, { scale }],
     };
   });
 
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={{uri: bannerUrl}}
+        source={{ uri: bannerUrl }}
         style={[styles.banner, animatedBannerStyle]}
         resizeMode="cover"
       />
@@ -61,12 +61,16 @@ const TeamBanner: React.FC<TeamBannerProps> = ({
       />
       <View style={styles.content}>
         <View style={styles.logoWrapper}>
-          <Image source={{uri: logoUrl}} style={styles.logo} />
+          <Image source={{ uri: logoUrl }} style={styles.logo} />
         </View>
         <Heading style={styles.name}>{teamName}</Heading>
         <View style={styles.badgeRow}>
           <View style={styles.gameBadge}>
-            <Icon name="gamepad-variant-outline" size={14} color={Colors.primary.main} />
+            <Icon
+              name="gamepad-variant-outline"
+              size={14}
+              color={Colors.primary.main}
+            />
             <Label style={styles.gameText}>{game}</Label>
           </View>
         </View>
@@ -82,12 +86,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   banner: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
     width: '100%',
     height: '100%',
   },
   gradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
   },
   content: {
     position: 'absolute',
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     elevation: 5,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
@@ -127,7 +131,7 @@ const styles = StyleSheet.create({
   gameBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(232, 33, 74, 0.1)',
+    backgroundColor: Colors.primary.transparent.light,
     paddingHorizontal: Spacing.md,
     paddingVertical: 4,
     borderRadius: Radius.full,

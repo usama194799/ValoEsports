@@ -1,5 +1,5 @@
-import {db} from '../data/db';
-import {Tournament} from '../types';
+import { db } from '../data/db';
+import { Tournament } from '../types';
 
 // Artificial delay to simulate network latency
 const DELAY_MS = 300;
@@ -24,7 +24,11 @@ export const tournamentService = {
   getUpcomingTournaments: async (): Promise<Tournament[]> => {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve(db.tournaments.filter(t => t.status === 'open' || t.status === 'upcoming'));
+        resolve(
+          db.tournaments.filter(
+            t => t.status === 'open' || t.status === 'upcoming',
+          ),
+        );
       }, DELAY_MS);
     });
   },

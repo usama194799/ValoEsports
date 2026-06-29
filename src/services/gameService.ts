@@ -1,5 +1,5 @@
-import {db} from '../data/db';
-import {Game, Match} from '../types';
+import { db } from '../data/db';
+import { Game, Match } from '../types';
 
 const DELAY_MS = 300;
 
@@ -15,7 +15,11 @@ export const gameService = {
   getRecentMatches: async (): Promise<Match[]> => {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve(db.matches.filter(m => m.status === 'completed' || m.status === 'live'));
+        resolve(
+          db.matches.filter(
+            m => m.status === 'completed' || m.status === 'live',
+          ),
+        );
       }, DELAY_MS);
     });
   },

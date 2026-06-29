@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,28 +7,31 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
 import OTPInput from '../components/OTPInput';
 import AuthButton from '../components/AuthButton';
-import {authService} from '../services/authService';
+import { authService } from '../services/authService';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'OTPVerification'>;
+type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'OTPVerification'
+>;
 type OTPRouteProp = RouteProp<AuthStackParamList, 'OTPVerification'>;
 
 const OTPVerificationScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<OTPRouteProp>();
-  
-  const {email, intent} = route.params;
+
+  const { email, intent } = route.params;
 
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +41,7 @@ const OTPVerificationScreen = () => {
     let interval: NodeJS.Timeout;
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
+        setTimer(prev => prev - 1);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -53,10 +56,11 @@ const OTPVerificationScreen = () => {
       if (intent === 'register') {
         navigation.navigate('Success', {
           title: 'Account Created!',
-          message: 'Your account has been created successfully. You can now access Mux Arena.',
+          message:
+            'Your account has been created successfully. You can now access Mux Arena.',
         });
       } else {
-        navigation.navigate('ResetPassword', {email, code});
+        navigation.navigate('ResetPassword', { email, code });
       }
     } catch (err: any) {
       Alert.alert('Verification Failed', err.message || 'Invalid code');
@@ -75,19 +79,22 @@ const OTPVerificationScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={[styles.content, {paddingTop: insets.top || Spacing.xl}]}>
-        
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={[styles.content, { paddingTop: insets.top || Spacing.xl }]}>
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
 
         <View style={styles.header}>
           <Heading style={styles.title}>Verification Code</Heading>
           <Label style={styles.subtitle}>
-            We've sent a 6-digit code to <Label style={styles.emailText}>{email}</Label>. Please enter it below.
+            We've sent a 6-digit code to{' '}
+            <Label style={styles.emailText}>{email}</Label>. Please enter it
+            below.
           </Label>
         </View>
 
@@ -95,7 +102,7 @@ const OTPVerificationScreen = () => {
           <OTPInput
             length={6}
             value={code}
-            onChange={(val) => {
+            onChange={val => {
               setCode(val);
               if (val.length === 6) {
                 // Auto verify
@@ -115,7 +122,9 @@ const OTPVerificationScreen = () => {
         <View style={styles.resendContainer}>
           <Label style={styles.resendText}>Didn't receive the code? </Label>
           <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
-            <Subheading style={[styles.resendLink, timer > 0 && styles.resendDisabled]}>
+            <Subheading
+              style={[styles.resendLink, timer > 0 && styles.resendDisabled]}
+            >
               {timer > 0 ? `Resend in ${timer}s` : 'Resend Now'}
             </Subheading>
           </TouchableOpacity>

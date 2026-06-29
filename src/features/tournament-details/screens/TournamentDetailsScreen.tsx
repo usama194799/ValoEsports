@@ -1,15 +1,15 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import {RouteProp, useRoute} from '@react-navigation/native';
-import {RootStackParamList} from '../../../navigation/types';
-import {DetailedTournament} from '../types';
-import {MOCK_TOURNAMENT_DETAILS} from '../constants';
-import {Colors} from '../../../theme/colors';
-import {wp} from '../../../utils/responsive';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { RootStackParamList } from '../../../navigation/types';
+import { DetailedTournament } from '../types';
+import { MOCK_TOURNAMENT_DETAILS } from '../constants';
+import { Colors } from '../../../theme/colors';
+import { wp } from '../../../utils/responsive';
 
 import HeroBanner from '../components/HeroBanner';
 import InfoCard from '../components/InfoCard';
@@ -24,12 +24,15 @@ import StickyRegistrationPanel from '../components/StickyRegistrationPanel';
 import RegistrationBottomSheet from '../components/RegistrationBottomSheet';
 import SkeletonDetails from '../components/SkeletonDetails';
 
-type TournamentDetailsRouteProp = RouteProp<RootStackParamList, 'TournamentDetails'>;
+type TournamentDetailsRouteProp = RouteProp<
+  RootStackParamList,
+  'TournamentDetails'
+>;
 
 const TournamentDetailsScreen: React.FC = () => {
   const route = useRoute<TournamentDetailsRouteProp>();
   const tournamentId = route.params?.tournamentId;
-  
+
   const [loading, setLoading] = useState(true);
   const [tournament, setTournament] = useState<DetailedTournament | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -53,7 +56,7 @@ const TournamentDetailsScreen: React.FC = () => {
       setIsFavorite(MOCK_TOURNAMENT_DETAILS.isFavorite);
       setLoading(false);
     };
-    
+
     fetchDetails();
   }, [tournamentId]);
 
@@ -84,8 +87,8 @@ const TournamentDetailsScreen: React.FC = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
-        
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Placeholder for the absolutely positioned Hero Banner height */}
         <View style={styles.heroPlaceholder} />
 

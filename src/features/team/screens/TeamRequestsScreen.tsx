@@ -1,21 +1,39 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {FlashList} from '@shopify/flash-list';
-import {useNavigation} from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
 import MemberAvatar from '../components/MemberAvatar';
 import EmptyState from '../../../components/EmptyState';
 
 // Dummy requests data
 const DUMMY_REQUESTS = [
-  {id: 'req1', user: {name: 'shroud', avatarUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=100&h=100', level: 88}, message: 'I would like to join your team!'},
-  {id: 'req2', user: {name: 'Tarik', avatarUrl: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=100&h=100', level: 95}, message: 'Looking for a competitive squad.'},
+  {
+    id: 'req1',
+    user: {
+      name: 'shroud',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=100&h=100',
+      level: 88,
+    },
+    message: 'I would like to join your team!',
+  },
+  {
+    id: 'req2',
+    user: {
+      name: 'Tarik',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=100&h=100',
+      level: 95,
+    },
+    message: 'Looking for a competitive squad.',
+  },
 ];
 
 const TeamRequestsScreen = () => {
@@ -31,7 +49,7 @@ const TeamRequestsScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({item}: {item: typeof DUMMY_REQUESTS[0]}) => (
+    ({ item }: { item: (typeof DUMMY_REQUESTS)[0] }) => (
       <View style={styles.requestCard}>
         <View style={styles.requestHeader}>
           <MemberAvatar url={item.user.avatarUrl} size={40} />
@@ -40,7 +58,7 @@ const TeamRequestsScreen = () => {
             <Label style={styles.playerLevel}>Level {item.user.level}</Label>
           </View>
         </View>
-        
+
         <View style={styles.messageBox}>
           <Label style={styles.messageText}>"{item.message}"</Label>
         </View>
@@ -48,12 +66,14 @@ const TeamRequestsScreen = () => {
         <View style={styles.actionsRow}>
           <TouchableOpacity
             style={[styles.actionBtn, styles.declineBtn]}
-            onPress={() => handleDecline(item.id)}>
+            onPress={() => handleDecline(item.id)}
+          >
             <Label style={styles.declineText}>Decline</Label>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionBtn, styles.acceptBtn]}
-            onPress={() => handleAccept(item.id)}>
+            onPress={() => handleAccept(item.id)}
+          >
             <Label style={styles.acceptText}>Accept</Label>
           </TouchableOpacity>
         </View>
@@ -64,12 +84,15 @@ const TeamRequestsScreen = () => {
 
   return (
     <View style={styles.root}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Join Requests</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.listContainer}>

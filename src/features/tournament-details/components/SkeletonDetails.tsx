@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,22 +7,22 @@ import Animated, {
   withTiming,
   withSequence,
 } from 'react-native-reanimated';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
 
-const SkeletonItem: React.FC<{width: number | string; height: number; style?: any}> = ({
-  width,
-  height,
-  style,
-}) => {
+const SkeletonItem: React.FC<{
+  width: number | string;
+  height: number;
+  style?: any;
+}> = ({ width, height, style }) => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0.7, {duration: 800}),
-        withTiming(0.3, {duration: 800}),
+        withTiming(0.7, { duration: 800 }),
+        withTiming(0.3, { duration: 800 }),
       ),
       -1,
       true,
@@ -35,12 +35,7 @@ const SkeletonItem: React.FC<{width: number | string; height: number; style?: an
 
   return (
     <Animated.View
-      style={[
-        styles.skeletonBase,
-        {width, height},
-        style,
-        animatedStyle,
-      ]}
+      style={[styles.skeletonBase, { width, height }, style, animatedStyle]}
     />
   );
 };
@@ -50,7 +45,7 @@ const SkeletonDetails: React.FC = () => {
     <View style={styles.container}>
       {/* Hero Skeleton */}
       <SkeletonItem width="100%" height={280} style={styles.hero} />
-      
+
       {/* Info Card Skeleton */}
       <View style={styles.card}>
         <View style={styles.row}>
@@ -72,7 +67,11 @@ const SkeletonDetails: React.FC = () => {
       {/* Description Skeleton */}
       <View style={styles.section}>
         <SkeletonItem width={160} height={24} style={styles.skeletonTitle} />
-        <SkeletonItem width="100%" height={16} style={styles.skeletonTextLine} />
+        <SkeletonItem
+          width="100%"
+          height={16}
+          style={styles.skeletonTextLine}
+        />
         <SkeletonItem width="90%" height={16} style={styles.skeletonTextLine} />
         <SkeletonItem width="80%" height={16} />
       </View>

@@ -1,34 +1,45 @@
 import React from 'react';
-import {StyleSheet, View, Dimensions} from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {Achievement} from '../types/profile';
+import { Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { Achievement } from '../types/profile';
 
 interface AchievementCardProps {
   achievement: Achievement;
 }
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - Spacing.xl * 2 - Spacing.md) / 2;
 
-const AchievementCard: React.FC<AchievementCardProps> = ({achievement}) => {
-  const {title, description, icon, isUnlocked, progress, total} = achievement;
-  const progressPercentage = Math.min(100, Math.max(0, (progress / total) * 100));
+const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
+  const { title, description, icon, isUnlocked, progress, total } = achievement;
+  const progressPercentage = Math.min(
+    100,
+    Math.max(0, (progress / total) * 100),
+  );
 
   return (
     <View style={[styles.container, !isUnlocked && styles.lockedContainer]}>
-      <View style={[styles.iconWrapper, isUnlocked ? styles.unlockedIcon : styles.lockedIcon]}>
+      <View
+        style={[
+          styles.iconWrapper,
+          isUnlocked ? styles.unlockedIcon : styles.lockedIcon,
+        ]}
+      >
         <Icon
           name={icon}
           size={24}
           color={isUnlocked ? Colors.primary.main : Colors.text.muted}
         />
       </View>
-      
-      <Subheading style={[styles.title, !isUnlocked && styles.lockedText]} numberOfLines={1}>
+
+      <Subheading
+        style={[styles.title, !isUnlocked && styles.lockedText]}
+        numberOfLines={1}
+      >
         {title}
       </Subheading>
       <Label style={styles.description} numberOfLines={2}>
@@ -40,8 +51,8 @@ const AchievementCard: React.FC<AchievementCardProps> = ({achievement}) => {
           <View
             style={[
               styles.progressBarFill,
-              {width: `${progressPercentage}%`},
-              isUnlocked && {backgroundColor: Colors.success.main},
+              { width: `${progressPercentage}%` },
+              isUnlocked && { backgroundColor: Colors.success.main },
             ]}
           />
         </View>
@@ -82,7 +93,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   lockedText: {
     color: Colors.text.secondary,
@@ -100,7 +111,7 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: Colors.neutral.borderLight,
     borderRadius: 2,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
     overflow: 'hidden',
   },
   progressBarFill: {

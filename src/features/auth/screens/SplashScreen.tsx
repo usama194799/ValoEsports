@@ -1,29 +1,29 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View, ImageBackground} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ImageBackground } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {useAuth} from '../hooks/useAuth';
-import {Heading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { useAuth } from '../hooks/useAuth';
+import { Heading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Splash'>;
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {hasSeenOnboarding, isLoading} = useAuth();
-  
+  const { hasSeenOnboarding, isLoading } = useAuth();
+
   const scale = useSharedValue(0.5);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     // Logo entrance animation
-    opacity.value = withTiming(1, {duration: 400});
+    opacity.value = withTiming(1, { duration: 400 });
 
     // Navigate away after 2.0s
     const timer = setTimeout(() => {
@@ -45,11 +45,14 @@ const SplashScreen = () => {
 
   return (
     <ImageBackground
-      source={{uri: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80'}}
+      source={{
+        uri: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80',
+      }}
       style={styles.container}
-      blurRadius={10}>
+      blurRadius={10}
+    >
       <View style={styles.overlay} />
-      
+
       <Animated.View style={[styles.content, animatedStyle]}>
         <View style={styles.logoBox}>
           <Heading style={styles.logoText}>M</Heading>
@@ -66,7 +69,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
     backgroundColor: 'rgba(13, 13, 26, 0.85)',
   },
   content: {
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
     shadowColor: Colors.primary.main,
-    shadowOffset: {width: 0, height: 10},
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 15,

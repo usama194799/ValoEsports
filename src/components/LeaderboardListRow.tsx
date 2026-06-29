@@ -1,11 +1,11 @@
 import React from 'react';
-import {StyleSheet, View, Image} from 'react-native';
-import {LeaderPlayer} from '../types';
-import {Heading, Subheading, Label, Caption} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
+import { StyleSheet, View, Image } from 'react-native';
+import { LeaderPlayer } from '../types';
+import { Heading, Subheading, Label, Caption } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
 
 interface LeaderboardListRowProps {
   player: LeaderPlayer;
@@ -14,18 +14,18 @@ interface LeaderboardListRowProps {
 const getRankColors = (rank: number) => {
   switch (rank) {
     case 1:
-      return {bg: Colors.leaderboard.rank1Bg, text: '#FFF'};
+      return { bg: Colors.leaderboard.rank1Bg, text: '#FFF' };
     case 2:
-      return {bg: Colors.leaderboard.rank2Bg, text: '#FFF'};
+      return { bg: Colors.leaderboard.rank2Bg, text: '#FFF' };
     case 3:
-      return {bg: Colors.leaderboard.rank3Bg, text: '#FFF'};
+      return { bg: Colors.leaderboard.rank3Bg, text: '#FFF' };
     default:
-      return {bg: Colors.leaderboard.rank4Bg, text: '#FFF'};
+      return { bg: Colors.leaderboard.rank4Bg, text: '#FFF' };
   }
 };
 
-const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({player}) => {
-  const {bg: bgColor, text: textColor} = getRankColors(player.rank);
+const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({ player }) => {
+  const { bg: bgColor, text: textColor } = getRankColors(player.rank);
 
   const formattedPoints =
     player.points >= 1000
@@ -33,11 +33,11 @@ const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({player}) => {
       : `${player.points}`;
 
   return (
-    <View style={[styles.row, {backgroundColor: bgColor}, Shadows.card]}>
+    <View style={[styles.row, { backgroundColor: bgColor }, Shadows.card]}>
       {/* Avatar & Badge */}
       <View style={styles.avatarWrapper}>
         <Image
-          source={{uri: player.avatar}}
+          source={{ uri: player.avatar }}
           style={styles.avatar}
           resizeMode="cover"
         />
@@ -48,20 +48,30 @@ const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({player}) => {
 
       {/* Team Info */}
       <View style={styles.teamInfo}>
-        <Subheading style={[styles.teamName, {color: textColor}]}>
+        <Subheading style={[styles.teamName, { color: textColor }]}>
           {player.teamName}
         </Subheading>
-        <Caption style={[styles.teamLabel, {color: 'rgba(255,255,255,0.7)'}]}>
+        <Caption
+          style={[
+            styles.teamLabel,
+            { color: Colors.neutral.whiteTransparent.max },
+          ]}
+        >
           {player.teamLabel}
         </Caption>
       </View>
 
       {/* Matches */}
       <View style={styles.matchesCol}>
-        <Heading style={[styles.matchesValue, {color: textColor}]}>
+        <Heading style={[styles.matchesValue, { color: textColor }]}>
           {player.games}
         </Heading>
-        <Label style={[styles.matchesLabel, {color: 'rgba(255,255,255,0.7)'}]}>
+        <Label
+          style={[
+            styles.matchesLabel,
+            { color: Colors.neutral.whiteTransparent.max },
+          ]}
+        >
           Match
         </Label>
       </View>
@@ -69,7 +79,7 @@ const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({player}) => {
       {/* Rating */}
       <View style={styles.ratingCol}>
         <View style={styles.ratingBadge}>
-          <Label style={[styles.ratingValue, {color: textColor}]}>
+          <Label style={[styles.ratingValue, { color: textColor }]}>
             {formattedPoints}
           </Label>
         </View>
@@ -145,7 +155,7 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
+    borderColor: Colors.neutral.whiteTransparent.heavy,
     alignItems: 'center',
     justifyContent: 'center',
   },

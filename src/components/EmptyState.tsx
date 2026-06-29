@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Spacing} from '../theme/spacing';
+import { Heading, Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Spacing } from '../theme/spacing';
 
 interface EmptyStateProps {
   icon?: string;

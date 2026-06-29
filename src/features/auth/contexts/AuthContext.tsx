@@ -1,6 +1,6 @@
-import React, {createContext, useState, useEffect, ReactNode} from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContextType, AuthState, User} from '../types/auth';
+import { AuthContextType, AuthState, User } from '../types/auth';
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -22,7 +22,9 @@ const STORAGE_KEYS = {
   ONBOARDING: '@mux_has_seen_onboarding',
 };
 
-export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [state, setState] = useState<AuthState>(initialState);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         });
       } catch (error) {
         console.error('Failed to load auth state', error);
-        setState(prev => ({...prev, isLoading: false}));
+        setState(prev => ({ ...prev, isLoading: false }));
       }
     };
 
@@ -93,14 +95,16 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
   const completeOnboarding = async () => {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING, 'true');
-      setState(prev => ({...prev, hasSeenOnboarding: true}));
+      setState(prev => ({ ...prev, hasSeenOnboarding: true }));
     } catch (e) {
       console.error('Failed to save onboarding state', e);
     }
   };
 
   return (
-    <AuthContext.Provider value={{...state, login, logout, completeOnboarding}}>
+    <AuthContext.Provider
+      value={{ ...state, login, logout, completeOnboarding }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,38 +1,53 @@
 import React from 'react';
-import {StyleSheet, View, ScrollView, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Heading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {useProfileData} from '../hooks/useProfileData';
+import { Heading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { useProfileData } from '../hooks/useProfileData';
 import StatCard from '../components/StatCard';
 
 const PlayerStatisticsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const {profile} = useProfileData();
+  const { profile } = useProfileData();
 
   if (!profile) return null;
 
-  const {statistics} = profile;
+  const { statistics } = profile;
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Player Statistics</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.row}>
-          <StatCard label="Matches Played" value={statistics.matchesPlayed} delay={100} />
-          <StatCard label="Win Rate" value={statistics.winRate} highlight delay={200} />
+          <StatCard
+            label="Matches Played"
+            value={statistics.matchesPlayed}
+            delay={100}
+          />
+          <StatCard
+            label="Win Rate"
+            value={statistics.winRate}
+            highlight
+            delay={200}
+          />
         </View>
 
         <View style={styles.row}>
@@ -41,22 +56,53 @@ const PlayerStatisticsScreen = () => {
         </View>
 
         <View style={styles.row}>
-          <StatCard label="K/D/A Ratio" value={statistics.kda} highlight delay={500} />
-          <StatCard label="Headshot %" value={statistics.headshotPercentage} delay={600} />
+          <StatCard
+            label="K/D/A Ratio"
+            value={statistics.kda}
+            highlight
+            delay={500}
+          />
+          <StatCard
+            label="Headshot %"
+            value={statistics.headshotPercentage}
+            delay={600}
+          />
         </View>
 
         <View style={styles.row}>
-          <StatCard label="MVP Awards" value={statistics.mvpAwards} delay={700} />
-          <StatCard label="Tourney Wins" value={statistics.tournamentWins} highlight delay={800} />
+          <StatCard
+            label="MVP Awards"
+            value={statistics.mvpAwards}
+            delay={700}
+          />
+          <StatCard
+            label="Tourney Wins"
+            value={statistics.tournamentWins}
+            highlight
+            delay={800}
+          />
         </View>
 
         <View style={styles.row}>
-          <StatCard label="Current Rank" value={profile.currentRank} delay={900} />
-          <StatCard label="Highest Rank" value={profile.highestRank} delay={1000} />
+          <StatCard
+            label="Current Rank"
+            value={profile.currentRank}
+            delay={900}
+          />
+          <StatCard
+            label="Highest Rank"
+            value={profile.highestRank}
+            delay={1000}
+          />
         </View>
 
         <View style={styles.singleRow}>
-          <StatCard label="Total Prize Money" value={statistics.prizeMoney} highlight delay={1100} />
+          <StatCard
+            label="Total Prize Money"
+            value={statistics.prizeMoney}
+            highlight
+            delay={1100}
+          />
         </View>
       </ScrollView>
     </View>

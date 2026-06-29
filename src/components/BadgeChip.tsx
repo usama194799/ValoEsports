@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, Text, View, ViewStyle} from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
 
 interface BadgeChipProps {
   icon?: string;
@@ -11,7 +11,7 @@ interface BadgeChipProps {
   style?: ViewStyle;
 }
 
-const BadgeChip: React.FC<BadgeChipProps> = ({icon, label, style}) => {
+const BadgeChip: React.FC<BadgeChipProps> = ({ icon, label, style }) => {
   return (
     <View style={[styles.chip, style]}>
       {icon ? (

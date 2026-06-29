@@ -1,14 +1,14 @@
-import React, {useCallback} from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import React, { useCallback } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming,
   interpolateColor,
 } from 'react-native-reanimated';
-import {Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Spacing} from '../theme/spacing';
+import { Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Spacing } from '../theme/spacing';
 
 interface CategoryChipsProps {
   categories: string[];
@@ -20,16 +20,16 @@ const Chip: React.FC<{
   label: string;
   isSelected: boolean;
   onPress: () => void;
-}> = ({label, isSelected, onPress}) => {
+}> = ({ label, isSelected, onPress }) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: withTiming(
         isSelected ? Colors.primary.main : Colors.dark.surface,
-        {duration: 200},
+        { duration: 200 },
       ),
       borderColor: withTiming(
         isSelected ? Colors.primary.main : Colors.neutral.border,
-        {duration: 200},
+        { duration: 200 },
       ),
     };
   });
@@ -67,7 +67,8 @@ const CategoryChips: React.FC<CategoryChipsProps> = ({
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
-      bounces={false}>
+      bounces={false}
+    >
       {categories.map(renderChip)}
     </ScrollView>
   );

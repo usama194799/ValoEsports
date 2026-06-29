@@ -1,5 +1,5 @@
-import {Platform, TextStyle} from 'react-native';
-import {Colors} from './colors';
+import { Platform, TextStyle } from 'react-native';
+import { Colors } from './colors';
 
 const fontFamily = Platform.select({
   android: 'sans-serif',

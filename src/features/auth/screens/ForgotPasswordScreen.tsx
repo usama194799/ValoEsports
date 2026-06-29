@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,20 +7,23 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {AuthStackParamList} from '../navigation/AuthNavigator';
-import {Heading, Label} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
+import { AuthStackParamList } from '../navigation/AuthNavigator';
+import { Heading, Label } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
-import {authService} from '../services/authService';
+import { authService } from '../services/authService';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
+type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'ForgotPassword'
+>;
 
 const ForgotPasswordScreen = () => {
   const insets = useSafeAreaInsets();
@@ -40,7 +43,7 @@ const ForgotPasswordScreen = () => {
     setIsLoading(true);
     try {
       await authService.requestPasswordReset(email);
-      navigation.navigate('OTPVerification', {email, intent: 'reset'});
+      navigation.navigate('OTPVerification', { email, intent: 'reset' });
     } catch (err: any) {
       setError(err.message || 'Failed to request reset');
       Alert.alert('Error', err.message);
@@ -52,19 +55,21 @@ const ForgotPasswordScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={[styles.content, {paddingTop: insets.top || Spacing.xl}]}>
-        
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={[styles.content, { paddingTop: insets.top || Spacing.xl }]}>
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
 
         <View style={styles.header}>
           <Heading style={styles.title}>Reset Password</Heading>
           <Label style={styles.subtitle}>
-            Enter the email associated with your account and we'll send an email with instructions to reset your password.
+            Enter the email associated with your account and we'll send an email
+            with instructions to reset your password.
           </Label>
         </View>
 

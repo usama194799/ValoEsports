@@ -1,5 +1,5 @@
-import {db} from '../data/db';
-import {UserProfile, Notification, HeroBannerData} from '../types';
+import { db } from '../data/db';
+import { UserProfile, Notification, HeroBannerData } from '../types';
 
 const DELAY_MS = 300;
 

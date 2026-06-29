@@ -1,14 +1,11 @@
-import React, {useCallback} from 'react';
-import {
-  Pressable,
-  ViewStyle,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { Pressable, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import {AnimationConfig} from '../theme/animations';
+import { AnimationConfig } from '../theme/animations';
 
 interface AnimatedPressableProps {
   onPress?: () => void;
@@ -29,18 +26,20 @@ const AnimatedPressableComponent: React.FC<AnimatedPressableProps> = ({
   const opacity = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
+    transform: [{ scale: scale.value }],
     opacity: opacity.value,
   }));
 
   const handlePressIn = useCallback(() => {
-    scale.value = withTiming(AnimationConfig.press.scaleDown, {duration: 100});
-    opacity.value = withTiming(0.8, {duration: 100});
+    scale.value = withTiming(AnimationConfig.press.scaleDown, {
+      duration: 100,
+    });
+    opacity.value = withTiming(0.8, { duration: 100 });
   }, [scale, opacity]);
 
   const handlePressOut = useCallback(() => {
-    scale.value = withTiming(AnimationConfig.press.scaleUp, {duration: 120});
-    opacity.value = withTiming(1, {duration: 120});
+    scale.value = withTiming(AnimationConfig.press.scaleUp, { duration: 120 });
+    opacity.value = withTiming(1, { duration: 120 });
   }, [scale, opacity]);
 
   return (
@@ -49,7 +48,8 @@ const AnimatedPressableComponent: React.FC<AnimatedPressableProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      style={[animatedStyle, style]}>
+      style={[animatedStyle, style]}
+    >
       {children}
     </AnimatedPressable>
   );

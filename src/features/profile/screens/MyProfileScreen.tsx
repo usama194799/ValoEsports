@@ -7,27 +7,27 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {RootStackParamList} from '../../../navigation/types';
-import {ROUTES} from '../../../navigation/routes';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
+import { RootStackParamList } from '../../../navigation/types';
+import { ROUTES } from '../../../navigation/routes';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
 
 import ProfileBanner from '../components/ProfileBanner';
-import {useProfileData} from '../hooks/useProfileData';
+import { useProfileData } from '../hooks/useProfileData';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const MyProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
-  const {profile, isLoading, isRefreshing, refresh, error} = useProfileData();
+  const { profile, isLoading, isRefreshing, refresh, error } = useProfileData();
 
   if (isLoading && !profile) {
     return (
@@ -40,7 +40,9 @@ const MyProfileScreen = () => {
   if (error || !profile) {
     return (
       <View style={[styles.container, styles.centerAll]}>
-        <Label style={{color: Colors.danger.main}}>{error || 'Failed to load profile'}</Label>
+        <Label style={{ color: Colors.danger.main }}>
+          {error || 'Failed to load profile'}
+        </Label>
       </View>
     );
   }
@@ -88,7 +90,8 @@ const MyProfileScreen = () => {
             onRefresh={refresh}
             tintColor={Colors.primary.main}
           />
-        }>
+        }
+      >
         <ProfileBanner
           fullName={profile.fullName}
           username={profile.username}
@@ -99,21 +102,20 @@ const MyProfileScreen = () => {
           country={profile.country}
           currentRank={profile.currentRank}
           bio={profile.bio}
-          style={{paddingTop: insets.top}}
+          style={{ paddingTop: insets.top }}
         />
 
         <View style={styles.actionRow}>
           <TouchableOpacity
             style={styles.editBtn}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate(ROUTES.EDIT_PROFILE)}>
+            onPress={() => navigation.navigate(ROUTES.EDIT_PROFILE)}
+          >
             <Icon name="pencil" size={20} color="#FFF" />
             <Label style={styles.editBtnText}>Edit Profile</Label>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.shareBtn}
-            activeOpacity={0.7}>
+          <TouchableOpacity style={styles.shareBtn} activeOpacity={0.7}>
             <Icon name="share-variant" size={20} color={Colors.text.primary} />
           </TouchableOpacity>
         </View>
@@ -127,16 +129,21 @@ const MyProfileScreen = () => {
                 index === sections.length - 1 && styles.lastMenuItem,
               ]}
               onPress={() => navigation.navigate(section.route as any)}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+            >
               <View style={styles.menuIconWrapper}>
-                <Icon name={section.icon} size={24} color={Colors.primary.main} />
+                <Icon
+                  name={section.icon}
+                  size={24}
+                  color={Colors.primary.main}
+                />
               </View>
               <Subheading style={styles.menuTitle}>{section.title}</Subheading>
               <Icon name="chevron-right" size={24} color={Colors.text.muted} />
             </TouchableOpacity>
           ))}
         </View>
-        <View style={{height: Spacing.xxl}} />
+        <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </View>
   );

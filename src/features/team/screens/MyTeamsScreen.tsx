@@ -1,26 +1,31 @@
-import React, {useCallback, useState} from 'react';
-import {StyleSheet, View, TouchableOpacity, RefreshControl} from 'react-native';
-import {FlashList, ListRenderItem} from '@shopify/flash-list';
+import React, { useCallback, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import { FlashList, ListRenderItem } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {Team} from '../types/team';
-import {useTeamData} from '../hooks/useTeamData';
-import {ROUTES} from '../../../navigation/routes';
-import {RootStackParamList} from '../../../navigation/types';
+import { Team } from '../types/team';
+import { useTeamData } from '../hooks/useTeamData';
+import { ROUTES } from '../../../navigation/routes';
+import { RootStackParamList } from '../../../navigation/types';
 
 import TeamCard from '../components/TeamCard';
 import EmptyState from '../../../components/EmptyState';
-import {Heading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Shadows} from '../../../theme/shadow';
+import { Heading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Shadows } from '../../../theme/shadow';
 import SkeletonTeamCard from '../components/SkeletonTeamCard';
 
 type MyTeamsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -28,7 +33,7 @@ type MyTeamsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const MyTeamsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<MyTeamsNavigationProp>();
-  const {teams} = useTeamData();
+  const { teams } = useTeamData();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -53,13 +58,13 @@ const MyTeamsScreen = () => {
 
   const handleTeamPress = useCallback(
     (teamId: string) => {
-      navigation.navigate(ROUTES.TEAM_DETAILS, {teamId});
+      navigation.navigate(ROUTES.TEAM_DETAILS, { teamId });
     },
     [navigation],
   );
 
   const renderItem: ListRenderItem<Team> = useCallback(
-    ({item, index}) => (
+    ({ item, index }) => (
       <TeamCard
         team={item}
         index={index}
@@ -70,7 +75,7 @@ const MyTeamsScreen = () => {
   );
 
   const fabStyle = useAnimatedStyle(() => ({
-    transform: [{scale: fabScale.value}],
+    transform: [{ scale: fabScale.value }],
   }));
 
   const renderEmpty = () => {
@@ -94,7 +99,7 @@ const MyTeamsScreen = () => {
 
   return (
     <View style={styles.root}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
         <Heading style={styles.headerTitle}>My Teams</Heading>
       </View>
 
@@ -125,7 +130,8 @@ const MyTeamsScreen = () => {
         <TouchableOpacity
           style={styles.fab}
           activeOpacity={0.8}
-          onPress={handleCreateTeam}>
+          onPress={handleCreateTeam}
+        >
           <Icon name="plus" size={28} color={Colors.text.primary} />
         </TouchableOpacity>
       </Animated.View>

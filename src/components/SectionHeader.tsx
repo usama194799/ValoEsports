@@ -1,15 +1,15 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import {Heading, Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Spacing} from '../theme/spacing';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Heading, Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Spacing } from '../theme/spacing';
 
 interface SectionHeaderProps {
   title: string;
   onSeeAll?: () => void;
 }
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({title, onSeeAll}) => {
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, onSeeAll }) => {
   return (
     <View style={styles.container}>
       <Heading style={styles.title}>{title}</Heading>
@@ -41,4 +41,3 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
-

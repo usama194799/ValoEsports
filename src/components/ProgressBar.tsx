@@ -1,13 +1,14 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import { Spacing } from '../theme/spacing';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import {Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
+import { Label } from './Typography';
+import { Colors, } from '../theme/colors';
+import { Radius } from '../theme/radius';
 
 interface ProgressBarProps {
   progress: number; // 0–1
@@ -23,7 +24,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const width = useSharedValue(0);
 
   useEffect(() => {
-    width.value = withTiming(progress, {duration: 800});
+    width.value = withTiming(progress, { duration: 800 });
   }, [progress, width]);
 
   const barStyle = useAnimatedStyle(() => ({
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   labelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   label: {
     color: Colors.text.secondary,

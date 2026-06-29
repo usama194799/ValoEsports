@@ -1,10 +1,5 @@
-import React, {useMemo} from 'react';
-import {
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useMemo } from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -13,12 +8,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Caption} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
+import { Heading, Caption } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
 
 interface HeroBannerProps {
   gameName: string;
@@ -30,7 +25,7 @@ interface HeroBannerProps {
   scrollY?: SharedValue<number>;
 }
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const BANNER_HEIGHT = wp(240);
 
 const HeroBanner: React.FC<HeroBannerProps> = ({
@@ -51,11 +46,11 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
       Extrapolation.CLAMP,
     );
     return {
-      transform: [{translateY}],
+      transform: [{ translateY }],
     };
   });
 
-  const imageSource = useMemo(() => ({uri: image}), [image]);
+  const imageSource = useMemo(() => ({ uri: image }), [image]);
 
   return (
     <View style={[styles.container, Shadows.cardHeavy]}>
@@ -77,14 +72,17 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
           <Caption style={styles.gameName}>{gameName}</Caption>
           <Heading style={styles.tournamentName}>{tournamentName}</Heading>
           <Caption style={styles.dateTime}>
-            {date}{'  •  '}{time}
+            {date}
+            {'  •  '}
+            {time}
           </Caption>
         </View>
         {/* Play Button */}
         <TouchableOpacity
           onPress={onPlay}
           activeOpacity={0.85}
-          style={[styles.playButton, Shadows.playButton]}>
+          style={[styles.playButton, Shadows.playButton]}
+        >
           <Icon name="chevron-right" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
       </View>
@@ -134,8 +132,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: Spacing.xs,
   },
-  dateTime: {
-  },
+  dateTime: {},
   playButton: {
     width: 44,
     height: 44,
@@ -148,4 +145,3 @@ const styles = StyleSheet.create({
 });
 
 export default React.memo(HeroBanner);
-

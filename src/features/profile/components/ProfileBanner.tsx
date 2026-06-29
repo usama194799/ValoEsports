@@ -1,12 +1,24 @@
 import React from 'react';
-import {StyleSheet, View, ImageBackground, Image, ViewStyle, StyleProp} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ImageBackground,
+  Image,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Heading, Label, Subheading, Body} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import Animated, {FadeInDown} from 'react-native-reanimated';
+import {
+  Heading,
+  Label,
+  Subheading,
+  Body,
+} from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 interface ProfileBannerProps {
   coverUrl?: string;
@@ -36,9 +48,10 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({
   return (
     <View style={[styles.container, style]}>
       <ImageBackground
-        source={{uri: coverUrl || 'https://via.placeholder.com/1024x400'}}
+        source={{ uri: coverUrl || 'https://via.placeholder.com/1024x400' }}
         style={styles.coverImage}
-        resizeMode="cover">
+        resizeMode="cover"
+      >
         <LinearGradient
           colors={['transparent', Colors.dark.background]}
           style={styles.gradient}
@@ -48,7 +61,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({
       <View style={styles.profileInfoContainer}>
         <View style={styles.avatarWrapper}>
           <Image
-            source={{uri: avatarUrl || 'https://via.placeholder.com/256'}}
+            source={{ uri: avatarUrl || 'https://via.placeholder.com/256' }}
             style={styles.avatar}
           />
           <View style={styles.levelBadge}>
@@ -60,7 +73,11 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({
           <View style={styles.nameRow}>
             <Heading style={styles.fullName}>{fullName}</Heading>
             {isVerified && (
-              <Icon name="check-decagram" size={20} color={Colors.primary.main} />
+              <Icon
+                name="check-decagram"
+                size={20}
+                color={Colors.primary.main}
+              />
             )}
           </View>
           <Subheading style={styles.username}>@{username}</Subheading>
@@ -68,7 +85,11 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({
 
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
-            <Icon name="map-marker-outline" size={16} color={Colors.text.secondary} />
+            <Icon
+              name="map-marker-outline"
+              size={16}
+              color={Colors.text.secondary}
+            />
             <Label style={styles.metaText}>{country}</Label>
           </View>
           <View style={styles.metaDot} />
@@ -98,7 +119,7 @@ const styles = StyleSheet.create({
     height: 180,
   },
   gradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...(StyleSheet.absoluteFill as any),
   },
   profileInfoContainer: {
     paddingHorizontal: Spacing.xl,

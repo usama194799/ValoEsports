@@ -1,7 +1,7 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {BottomTabParamList} from './types';
-import {ROUTES} from './routes';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabParamList } from './types';
+import { ROUTES } from './routes';
 import BottomTabBar from '../components/BottomTabBar';
 
 // Screens
@@ -19,7 +19,8 @@ const BottomTabNavigator = () => {
       tabBar={props => <BottomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-      }}>
+      }}
+    >
       <Tab.Screen name={ROUTES.HOME_TAB} component={DashboardScreen} />
       <Tab.Screen name={ROUTES.TOURNAMENTS_TAB} component={TournamentScreen} />
       <Tab.Screen name={ROUTES.TEAMS_TAB} component={MyTeamsScreen} />

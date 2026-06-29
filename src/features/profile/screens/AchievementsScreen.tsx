@@ -1,43 +1,60 @@
-import React, {useCallback} from 'react';
-import {StyleSheet, View, TouchableOpacity, RefreshControl} from 'react-native';
-import {FlashList} from '@shopify/flash-list';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useCallback } from 'react';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Heading, Label} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {useProfileData} from '../hooks/useProfileData';
+import { Heading, Label } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { useProfileData } from '../hooks/useProfileData';
 import AchievementCard from '../components/AchievementCard';
 
 const AchievementsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const {profile, isRefreshing, refresh} = useProfileData();
+  const { profile, isRefreshing, refresh } = useProfileData();
 
-  const renderEmptyState = useCallback(() => (
-    <View style={styles.emptyContainer}>
-      <Icon name="trophy-broken" size={64} color={Colors.neutral.borderLight} />
-      <Heading style={styles.emptyTitle}>No Achievements</Heading>
-      <Label style={styles.emptySubtitle}>Complete challenges to unlock achievements.</Label>
-    </View>
-  ), []);
+  const renderEmptyState = useCallback(
+    () => (
+      <View style={styles.emptyContainer}>
+        <Icon
+          name="trophy-broken"
+          size={64}
+          color={Colors.neutral.borderLight}
+        />
+        <Heading style={styles.emptyTitle}>No Achievements</Heading>
+        <Label style={styles.emptySubtitle}>
+          Complete challenges to unlock achievements.
+        </Label>
+      </View>
+    ),
+    [],
+  );
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, {paddingTop: insets.top || Spacing.md}]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Heading style={styles.headerTitle}>Achievements</Heading>
-        <View style={{width: 40}} />
+        <View style={{ width: 40 }} />
       </View>
 
       <FlashList
         data={profile?.achievements || []}
-        keyExtractor={(item) => item.id}
-        renderItem={({item}) => <AchievementCard achievement={item} />}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => <AchievementCard achievement={item} />}
         estimatedItemSize={160}
         numColumns={2}
         contentContainerStyle={styles.listContent}
@@ -86,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: Spacing.xxl * 2,
     // When using numColumns, the empty component takes the width of a single column by default unless styled
-    width: '100%', 
+    width: '100%',
   },
   emptyTitle: {
     fontSize: 20,

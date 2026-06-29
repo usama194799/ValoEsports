@@ -40,7 +40,12 @@ export interface HeroBannerData {
 }
 
 // Navigation Tab Type
-export type TabName = 'Home' | 'Tournaments' | 'Center' | 'Notification' | 'Profile';
+export type TabName =
+  | 'Home'
+  | 'Tournaments'
+  | 'Center'
+  | 'Notification'
+  | 'Profile';
 
 export interface NavTab {
   name: TabName;

@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, View, ViewStyle, StyleProp} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,10 +7,10 @@ import Animated, {
   withDelay,
   FadeInUp,
 } from 'react-native-reanimated';
-import {Label, Heading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
+import { Label, Heading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
 
 interface StatCardProps {
   label: string;
@@ -20,18 +20,21 @@ interface StatCardProps {
   style?: StyleProp<ViewStyle>;
 }
 
-const StatCard: React.FC<StatCardProps> = ({label, value, delay = 0, highlight, style}) => {
+const StatCard: React.FC<StatCardProps> = ({
+  label,
+  value,
+  delay = 0,
+  highlight,
+  style,
+}) => {
   const isNumeric = typeof value === 'number';
   // Note: True animated counting requires more complex logic (e.g. useDerivedValue),
   // but for the visual "fade up" presentation we use standard reanimated Layout Animations.
 
   return (
     <View
-      style={[
-        styles.container,
-        highlight && styles.highlightContainer,
-        style,
-      ]}>
+      style={[styles.container, highlight && styles.highlightContainer, style]}
+    >
       <Label style={styles.label}>{label}</Label>
       <Heading style={[styles.value, highlight && styles.highlightValue]}>
         {value}

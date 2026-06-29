@@ -31,6 +31,11 @@ export const Colors = {
     main: '#E8214A',
     dark: '#C41A3C',
     glow: 'rgba(232, 33, 74, 0.3)',
+    transparent: {
+      light: 'rgba(232, 33, 74, 0.1)',
+      medium: 'rgba(232, 33, 74, 0.15)',
+      dark: 'rgba(232, 33, 74, 0.3)',
+    },
   },
   secondary: {
     main: '#1E1E30',
@@ -39,16 +44,30 @@ export const Colors = {
   accent: {
     main: '#A0A0B8',
     muted: '#6B6B85',
+    transparent: 'rgba(160, 160, 184, 0.1)',
   },
   danger: {
     main: '#FF4C4C',
+    transparent: {
+      light: 'rgba(255, 76, 76, 0.1)',
+      medium: 'rgba(255, 59, 48, 0.1)',
+      dark: 'rgba(244, 67, 54, 0.2)',
+    },
   },
   success: {
     main: '#00C853',
     dark: '#00A844',
+    transparent: {
+      light: 'rgba(0, 200, 83, 0.1)',
+      medium: 'rgba(56, 168, 13, 0.15)',
+    },
   },
   warning: {
     main: '#FFD700',
+    transparent: {
+      light: 'rgba(255, 193, 7, 0.1)',
+      medium: 'rgba(255, 149, 0, 0.1)',
+    },
   },
   neutral: {
     white: '#FFFFFF',
@@ -56,6 +75,18 @@ export const Colors = {
     overlay: 'rgba(0,0,0,0.5)',
     border: 'rgba(255, 255, 255, 0.08)',
     borderLight: 'rgba(255, 255, 255, 0.12)',
+    whiteTransparent: {
+      light: 'rgba(255,255,255,0.05)',
+      medium: 'rgba(255,255,255,0.1)',
+      heavy: 'rgba(255,255,255,0.5)',
+      max: 'rgba(255,255,255,0.7)',
+    },
+    blackTransparent: {
+      light: 'rgba(0,0,0,0.3)',
+      medium: 'rgba(0,0,0,0.6)',
+      heavy: 'rgba(0,0,0,0.7)',
+      max: 'rgba(0,0,0,0.8)',
+    },
   },
 
   // Typography

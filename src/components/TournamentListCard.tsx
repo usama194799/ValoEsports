@@ -1,20 +1,20 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Tournament} from '../types';
+import { Tournament } from '../types';
 import ProgressBar from './ProgressBar';
 import LocationBadge from './LocationBadge';
 import GameBadge from './GameBadge';
 import BadgeChip from './BadgeChip';
 import LiveBadge from './LiveBadge';
 import OpenBadge from './OpenBadge';
-import {Heading, Subheading, Caption, Label} from './Typography';
-import {Colors} from '../theme/colors';
-import {Radius} from '../theme/radius';
-import {Shadows} from '../theme/shadow';
-import {Spacing} from '../theme/spacing';
-import {wp} from '../utils/responsive';
+import { Heading, Subheading, Caption, Label } from './Typography';
+import { Colors } from '../theme/colors';
+import { Radius } from '../theme/radius';
+import { Shadows } from '../theme/shadow';
+import { Spacing } from '../theme/spacing';
+import { wp } from '../utils/responsive';
 import AnimatedPressable from './AnimatedPressable';
 
 interface TournamentListCardProps {
@@ -37,7 +37,7 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
   const slotPercent = Math.round((item.slotsUsed / item.slots) * 100);
   const progress = item.slotsUsed / item.slots;
 
-  const imageSource = useMemo(() => ({uri: item.image}), [item.image]);
+  const imageSource = useMemo(() => ({ uri: item.image }), [item.image]);
 
   const renderBadge = () => {
     switch (item.status) {
@@ -53,7 +53,9 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
   };
 
   const favoriteIcon = item.isFavorite ? 'cards-heart' : 'cards-heart-outline';
-  const favoriteColor = item.isFavorite ? Colors.primary.main : Colors.text.primary;
+  const favoriteColor = item.isFavorite
+    ? Colors.primary.main
+    : Colors.text.primary;
 
   return (
     <View style={styles.container}>
@@ -85,7 +87,11 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
 
             <View style={styles.actionRow}>
               <TouchableOpacity onPress={onShare} style={styles.iconBtn}>
-                <Icon name="share-variant-outline" size={20} color={Colors.text.primary} />
+                <Icon
+                  name="share-variant-outline"
+                  size={20}
+                  color={Colors.text.primary}
+                />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFavorite} style={styles.iconBtn}>
                 <Icon name={favoriteIcon} size={20} color={favoriteColor} />
@@ -104,11 +110,15 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
           <View style={styles.infoGrid}>
             <View style={styles.infoCol}>
               <Label style={styles.infoLabel}>Entry Fee</Label>
-              <Subheading style={styles.infoValue}>{item.entryFee || 'Free'}</Subheading>
+              <Subheading style={styles.infoValue}>
+                {item.entryFee || 'Free'}
+              </Subheading>
             </View>
             <View style={styles.infoCol}>
               <Label style={styles.infoLabel}>Prize Pool</Label>
-              <Subheading style={[styles.infoValue, {color: Colors.gaming.rankGold}]}>
+              <Subheading
+                style={[styles.infoValue, { color: Colors.gaming.rankGold }]}
+              >
                 {item.prizePool || 'TBA'}
               </Subheading>
             </View>
@@ -134,7 +144,11 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
 
           {/* Footer Action */}
           <View style={styles.footer}>
-            <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.viewBtn}>
+            <TouchableOpacity
+              onPress={onPress}
+              activeOpacity={0.8}
+              style={styles.viewBtn}
+            >
               <Label style={styles.viewBtnText}>View Details</Label>
             </TouchableOpacity>
           </View>
@@ -223,7 +237,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 10,
     color: Colors.text.muted,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   infoValue: {
     fontSize: 14,

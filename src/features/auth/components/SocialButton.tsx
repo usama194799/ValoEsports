@@ -1,10 +1,15 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, TouchableOpacityProps, View} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
-import {Label} from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
+import { Label } from '../../../components/Typography';
 
 interface SocialButtonProps extends TouchableOpacityProps {
   provider: 'google' | 'apple' | 'discord';
@@ -20,23 +25,24 @@ const SocialButton: React.FC<SocialButtonProps> = ({
   const getProviderConfig = () => {
     switch (provider) {
       case 'google':
-        return {icon: 'google', color: '#DB4437'};
+        return { icon: 'google', color: '#DB4437' };
       case 'apple':
-        return {icon: 'apple', color: '#FFFFFF'};
+        return { icon: 'apple', color: '#FFFFFF' };
       case 'discord':
-        return {icon: 'discord', color: '#5865F2'};
+        return { icon: 'discord', color: '#5865F2' };
       default:
-        return {icon: 'help', color: '#FFFFFF'};
+        return { icon: 'help', color: '#FFFFFF' };
     }
   };
 
-  const {icon, color} = getProviderConfig();
+  const { icon, color } = getProviderConfig();
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       style={[styles.container, style]}
-      {...props}>
+      {...props}
+    >
       <View style={styles.iconContainer}>
         <Icon name={icon} size={22} color={color} />
       </View>

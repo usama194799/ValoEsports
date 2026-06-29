@@ -1,24 +1,27 @@
-import React, {useCallback, useState} from 'react';
-import {StyleSheet, View, ScrollView, TouchableOpacity} from 'react-native';
-import {useRoute, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {RootStackParamList} from '../../../navigation/types';
-import {ROUTES} from '../../../navigation/routes';
-import {useTeamData} from '../hooks/useTeamData';
-import {Colors} from '../../../theme/colors';
-import {Spacing} from '../../../theme/spacing';
-import {Radius} from '../../../theme/radius';
-import {Heading, Label, Subheading} from '../../../components/Typography';
+import { RootStackParamList } from '../../../navigation/types';
+import { ROUTES } from '../../../navigation/routes';
+import { useTeamData } from '../hooks/useTeamData';
+import { Colors } from '../../../theme/colors';
+import { Spacing } from '../../../theme/spacing';
+import { Radius } from '../../../theme/radius';
+import { Heading, Label, Subheading } from '../../../components/Typography';
 
 import TeamBanner from '../components/TeamBanner';
-import {SectionContainer, CardContainer} from '../../tournament-details/components/LayoutContainers';
+import {
+  SectionContainer,
+  CardContainer,
+} from '../../tournament-details/components/LayoutContainers';
 import MemberAvatar from '../components/MemberAvatar';
 
 type TeamDetailsRouteProp = any;
@@ -28,8 +31,8 @@ const TeamDetailsScreen = () => {
   const insets = useSafeAreaInsets();
   const route = useRoute<TeamDetailsRouteProp>();
   const navigation = useNavigation<TeamDetailsNavigationProp>();
-  const {getTeamById, getTeamStats, getTeamMembers} = useTeamData();
-  
+  const { getTeamById, getTeamStats, getTeamMembers } = useTeamData();
+
   const teamId = route.params?.teamId;
   const team = getTeamById(teamId);
   const stats = getTeamStats(teamId);
@@ -44,19 +47,19 @@ const TeamDetailsScreen = () => {
   });
 
   const handleEditPress = useCallback(() => {
-    navigation.navigate(ROUTES.EDIT_TEAM, {teamId});
+    navigation.navigate(ROUTES.EDIT_TEAM, { teamId });
   }, [navigation, teamId]);
 
   const handleInvitePress = useCallback(() => {
-    navigation.navigate(ROUTES.INVITE_PLAYERS, {teamId});
+    navigation.navigate(ROUTES.INVITE_PLAYERS, { teamId });
   }, [navigation, teamId]);
 
   const handleMembersPress = useCallback(() => {
-    navigation.navigate(ROUTES.TEAM_MEMBERS, {teamId});
+    navigation.navigate(ROUTES.TEAM_MEMBERS, { teamId });
   }, [navigation, teamId]);
 
   const handleSettingsPress = useCallback(() => {
-    navigation.navigate(ROUTES.TEAM_SETTINGS, {teamId});
+    navigation.navigate(ROUTES.TEAM_SETTINGS, { teamId });
   }, [navigation, teamId]);
 
   if (!team) return null;
@@ -66,17 +69,19 @@ const TeamDetailsScreen = () => {
   return (
     <View style={styles.root}>
       {/* Absolute Back Button */}
-      <View style={[styles.headerOverlay, {top: insets.top || Spacing.md}]}>
+      <View style={[styles.headerOverlay, { top: insets.top || Spacing.md }]}>
         <TouchableOpacity
           style={styles.iconButton}
           activeOpacity={0.8}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Icon name="arrow-left" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
           activeOpacity={0.8}
-          onPress={handleSettingsPress}>
+          onPress={handleSettingsPress}
+        >
           <Icon name="cog-outline" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
       </View>
@@ -85,8 +90,8 @@ const TeamDetailsScreen = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: insets.bottom + Spacing.xl}}>
-        
+        contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
+      >
         <TeamBanner
           bannerUrl={team.bannerUrl}
           logoUrl={team.logoUrl}
@@ -96,11 +101,21 @@ const TeamDetailsScreen = () => {
         />
 
         <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.actionBtnPrimary} onPress={handleInvitePress}>
-            <Icon name="account-plus-outline" size={20} color={Colors.primary.main} />
+          <TouchableOpacity
+            style={styles.actionBtnPrimary}
+            onPress={handleInvitePress}
+          >
+            <Icon
+              name="account-plus-outline"
+              size={20}
+              color={Colors.primary.main}
+            />
             <Label style={styles.actionTextPrimary}>Invite</Label>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtnSecondary} onPress={handleEditPress}>
+          <TouchableOpacity
+            style={styles.actionBtnSecondary}
+            onPress={handleEditPress}
+          >
             <Icon name="pencil-outline" size={20} color={Colors.text.primary} />
             <Label style={styles.actionTextSecondary}>Edit Team</Label>
           </TouchableOpacity>
@@ -110,7 +125,7 @@ const TeamDetailsScreen = () => {
           <CardContainer>
             <Label style={styles.description}>{team.description}</Label>
             <View style={styles.divider} />
-            
+
             <View style={styles.infoGrid}>
               <View style={styles.infoItem}>
                 <Label style={styles.infoLabel}>Country</Label>
@@ -122,7 +137,9 @@ const TeamDetailsScreen = () => {
               </View>
               <View style={styles.infoItem}>
                 <Label style={styles.infoLabel}>Rank</Label>
-                <Subheading style={[styles.infoValue, {color: Colors.gaming.rankGold}]}>
+                <Subheading
+                  style={[styles.infoValue, { color: Colors.gaming.rankGold }]}
+                >
                   #{team.rank}
                 </Subheading>
               </View>
@@ -138,14 +155,28 @@ const TeamDetailsScreen = () => {
           title="Members"
           headerRight={
             <TouchableOpacity onPress={handleMembersPress}>
-              <Label style={styles.viewAllText}>View All ({members.length})</Label>
+              <Label style={styles.viewAllText}>
+                View All ({members.length})
+              </Label>
             </TouchableOpacity>
-          }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.membersScroll}>
+          }
+        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.membersScroll}
+          >
             {members.slice(0, 5).map(member => (
               <View key={member.id} style={styles.memberBox}>
-                <MemberAvatar url={member.avatarUrl} size={56} online={member.online} role={member.role} />
-                <Label style={styles.memberName} numberOfLines={1}>{member.name}</Label>
+                <MemberAvatar
+                  url={member.avatarUrl}
+                  size={56}
+                  online={member.online}
+                  role={member.role}
+                />
+                <Label style={styles.memberName} numberOfLines={1}>
+                  {member.name}
+                </Label>
               </View>
             ))}
           </ScrollView>
@@ -159,8 +190,10 @@ const TeamDetailsScreen = () => {
               <Label style={styles.statLabel}>Matches</Label>
             </View>
             <View style={styles.statCard}>
-              <Icon name="percent" size={24} color={Colors.gaming.winRate} />
-              <Heading style={[styles.statValue, {color: Colors.gaming.winRate}]}>
+              <Icon name="percent" size={24} color={Colors.success.main} />
+              <Heading
+                style={[styles.statValue, { color: Colors.success.main }]}
+              >
                 {stats.winRate}%
               </Heading>
               <Label style={styles.statLabel}>Win Rate</Label>
@@ -172,7 +205,6 @@ const TeamDetailsScreen = () => {
             </View>
           </View>
         </SectionContainer>
-
       </Animated.ScrollView>
     </View>
   );
@@ -256,7 +288,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     color: Colors.text.muted,
     fontSize: 11,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   infoValue: {
     fontSize: 14,

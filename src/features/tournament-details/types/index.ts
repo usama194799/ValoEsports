@@ -80,7 +80,7 @@ export interface DetailedTournament {
   slotsUsed: number;
   description: string;
   isFavorite: boolean;
-  
+
   organizer: OrganizerProfile;
   stats: TournamentStats;
   prizes: PrizeReward[];

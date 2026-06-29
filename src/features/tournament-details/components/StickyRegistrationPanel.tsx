@@ -1,13 +1,13 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import Animated, {FadeInDown} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DetailedTournament} from '../types';
-import {Heading, Label, Subheading} from '../../../components/Typography';
-import {Colors} from '../../../theme/colors';
-import {Radius} from '../../../theme/radius';
-import {Spacing} from '../../../theme/spacing';
+import { DetailedTournament } from '../types';
+import { Heading, Label, Subheading } from '../../../components/Typography';
+import { Colors } from '../../../theme/colors';
+import { Radius } from '../../../theme/radius';
+import { Spacing } from '../../../theme/spacing';
 
 interface StickyRegistrationPanelProps {
   tournament: DetailedTournament;
@@ -19,7 +19,7 @@ const StickyRegistrationPanel: React.FC<StickyRegistrationPanelProps> = ({
   onRegisterPress,
 }) => {
   const insets = useSafeAreaInsets();
-  
+
   const getButtonState = () => {
     switch (tournament.status) {
       case 'open':
@@ -57,27 +57,30 @@ const StickyRegistrationPanel: React.FC<StickyRegistrationPanelProps> = ({
 
   return (
     <View
-      style={[
-        styles.container,
-        {paddingBottom: insets.bottom || Spacing.md},
-      ]}>
+      style={[styles.container, { paddingBottom: insets.bottom || Spacing.md }]}
+    >
       <View style={styles.leftCol}>
         <View style={styles.feeWrapper}>
           <Label style={styles.feeLabel}>Entry Fee</Label>
-          <Heading style={styles.feeValue} numberOfLines={1}>{tournament.entryFee}</Heading>
+          <Heading style={styles.feeValue} numberOfLines={1}>
+            {tournament.entryFee}
+          </Heading>
         </View>
         <View style={styles.feeWrapper}>
           <Label style={styles.feeLabel}>Prize Pool</Label>
-          <Subheading style={styles.prizeValue} numberOfLines={1}>{tournament.prizePool}</Subheading>
+          <Subheading style={styles.prizeValue} numberOfLines={1}>
+            {tournament.prizePool}
+          </Subheading>
         </View>
       </View>
-      
+
       <TouchableOpacity
-        style={[styles.btn, {backgroundColor: btnState.bg}]}
+        style={[styles.btn, { backgroundColor: btnState.bg }]}
         onPress={btnState.onPress}
         disabled={btnState.disabled}
-        activeOpacity={0.8}>
-        <Subheading style={[styles.btnText, {color: btnState.text}]}>
+        activeOpacity={0.8}
+      >
+        <Subheading style={[styles.btnText, { color: btnState.text }]}>
           {btnState.label}
         </Subheading>
         {btnState.icon && (
