@@ -7,8 +7,6 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSequence,
-  withSpring,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -50,15 +48,8 @@ const MyTeamsScreen = () => {
   }, []);
 
   const handleCreateTeam = useCallback(() => {
-    fabScale.value = withSequence(
-      withSpring(0.9),
-      withSpring(1, undefined, () => {
-        // Must run on JS thread for navigation
-      })
-    );
-    // Navigate immediately anyway
     navigation.navigate(ROUTES.CREATE_TEAM);
-  }, [navigation, fabScale]);
+  }, [navigation]);
 
   const handleTeamPress = useCallback(
     (teamId: string) => {

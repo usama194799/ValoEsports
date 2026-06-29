@@ -27,6 +27,13 @@ export type RootStackParamList = {
   [ROUTES.TEAM_SETTINGS]: {teamId: string};
   [ROUTES.SETTINGS]: undefined;
   [ROUTES.SEARCH]: undefined;
+
+  [ROUTES.EDIT_PROFILE]: undefined;
+  [ROUTES.PLAYER_STATISTICS]: undefined;
+  [ROUTES.MATCH_HISTORY]: undefined;
+  [ROUTES.ACHIEVEMENTS]: undefined;
+  [ROUTES.SOCIAL_LINKS]: undefined;
+  [ROUTES.PROFILE_SETTINGS]: undefined;
 };
 
 // Strongly typed props for Stack Screens

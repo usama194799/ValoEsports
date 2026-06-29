@@ -9,7 +9,7 @@ import DashboardScreen from '../screens/DashboardScreen';
 import TournamentScreen from '../screens/TournamentScreen';
 import MyTeamsScreen from '../features/team/screens/MyTeamsScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import MyProfileScreen from '../features/profile/screens/MyProfileScreen';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -24,7 +24,7 @@ const BottomTabNavigator = () => {
       <Tab.Screen name={ROUTES.TOURNAMENTS_TAB} component={TournamentScreen} />
       <Tab.Screen name={ROUTES.TEAMS_TAB} component={MyTeamsScreen} />
       <Tab.Screen name={ROUTES.LEADERBOARD_TAB} component={LeaderboardScreen} />
-      <Tab.Screen name={ROUTES.PROFILE_TAB} component={ProfileScreen} />
+      <Tab.Screen name={ROUTES.PROFILE_TAB} component={MyProfileScreen} />
     </Tab.Navigator>
   );
 };

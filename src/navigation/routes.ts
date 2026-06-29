@@ -25,4 +25,12 @@ export const ROUTES = {
   TEAM_MEMBERS: 'TeamMembers',
   TEAM_REQUESTS: 'TeamRequests',
   TEAM_SETTINGS: 'TeamSettings',
+
+  // Profile
+  EDIT_PROFILE: 'EditProfile',
+  PLAYER_STATISTICS: 'PlayerStatistics',
+  MATCH_HISTORY: 'MatchHistory',
+  ACHIEVEMENTS: 'Achievements',
+  SOCIAL_LINKS: 'SocialLinks',
+  PROFILE_SETTINGS: 'ProfileSettings',
 } as const;

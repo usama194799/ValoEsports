@@ -56,11 +56,10 @@ const StickyRegistrationPanel: React.FC<StickyRegistrationPanelProps> = ({
   const btnState = getButtonState();
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(300).springify()}
+    <View
       style={[
         styles.container,
-        {paddingBottom: insets.bottom ? insets.bottom + Spacing.sm : Spacing.xl},
+        {paddingBottom: insets.bottom || Spacing.md},
       ]}>
       <View style={styles.leftCol}>
         <View style={styles.feeWrapper}>
@@ -85,7 +84,7 @@ const StickyRegistrationPanel: React.FC<StickyRegistrationPanelProps> = ({
           <Icon name={btnState.icon} size={20} color={btnState.text} />
         )}
       </TouchableOpacity>
-    </Animated.View>
+    </View>
   );
 };
 

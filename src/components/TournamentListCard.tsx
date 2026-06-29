@@ -1,13 +1,6 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withDelay,
-  withTiming,
-  withSpring,
-  withSequence,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Tournament} from '../types';
 import ProgressBar from './ProgressBar';
@@ -44,19 +37,6 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
   const slotPercent = Math.round((item.slotsUsed / item.slots) * 100);
   const progress = item.slotsUsed / item.slots;
 
-  const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.95);
-
-  useEffect(() => {
-    opacity.value = withDelay(index * 100, withTiming(1, {duration: 400}));
-    scale.value = withDelay(index * 100, withSpring(1, {damping: 15}));
-  }, [index, opacity, scale]);
-
-  const slideStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{scale: scale.value}],
-  }));
-
   const imageSource = useMemo(() => ({uri: item.image}), [item.image]);
 
   const renderBadge = () => {
@@ -76,7 +56,7 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
   const favoriteColor = item.isFavorite ? Colors.primary.main : Colors.text.primary;
 
   return (
-    <Animated.View style={[styles.container, slideStyle]}>
+    <View style={styles.container}>
       <AnimatedPressable onPress={onPress} style={styles.cardInner}>
         {/* Banner Section */}
         <View style={styles.bannerContainer}>
@@ -160,7 +140,7 @@ const TournamentListCard: React.FC<TournamentListCardProps> = ({
           </View>
         </View>
       </AnimatedPressable>
-    </Animated.View>
+    </View>
   );
 };
 

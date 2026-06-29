@@ -5,8 +5,6 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
-  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,15 +23,15 @@ const SuccessScreen = () => {
   const route = useRoute<SuccessRouteProp>();
   const {title, message} = route.params;
 
-  const scale = useSharedValue(0.3);
+  const scale = useSharedValue(0.9);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     // Disable back button
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
     
-    scale.value = withSpring(1, {damping: 12});
-    opacity.value = withDelay(300, withTiming(1, {duration: 500}));
+    scale.value = withTiming(1, {duration: 200});
+    opacity.value = withTiming(1, {duration: 300});
 
     return () => backHandler.remove();
   }, [opacity, scale]);

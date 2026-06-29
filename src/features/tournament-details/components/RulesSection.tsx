@@ -4,7 +4,6 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withSpring,
   withTiming,
   measure,
   useAnimatedRef,
@@ -37,7 +36,7 @@ const AccordionItem: React.FC<{rule: TournamentRule; index: number}> = ({rule, i
   }));
 
   const iconStyle = useAnimatedStyle(() => ({
-    transform: [{rotate: withSpring(expanded ? '180deg' : '0deg')}],
+    transform: [{rotate: withTiming(expanded ? '180deg' : '0deg', {duration: 200})}],
   }));
 
   const toggle = () => {

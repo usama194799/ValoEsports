@@ -1,4 +1,5 @@
 import React from 'react';
+import {Platform} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // We'll create these screens next
@@ -28,7 +29,11 @@ const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export const AuthNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator 
+      screenOptions={{
+        headerShown: false,
+        animation: Platform.OS === 'android' ? 'slide_from_right' : 'default',
+      }}>
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

@@ -16,7 +16,7 @@ interface TeamCardProps {
 
 const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
   return (
-    <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+    <View style={styles.cardContainer}>
       <View style={styles.card}>
         <View style={styles.header}>
           <Image source={{uri: team.logoUrl}} style={styles.logo} />
@@ -78,7 +78,7 @@ const TeamCard: React.FC<TeamCardProps> = ({team, index, onPress}) => {
           <Label style={styles.detailsText}>View Details</Label>
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

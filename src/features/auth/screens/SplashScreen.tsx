@@ -3,10 +3,7 @@ import {StyleSheet, View, ImageBackground} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
-  withSequence,
-  withDelay,
 } from 'react-native-reanimated';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -26,10 +23,9 @@ const SplashScreen = () => {
 
   useEffect(() => {
     // Logo entrance animation
-    opacity.value = withTiming(1, {duration: 800});
-    scale.value = withSpring(1, {damping: 12, stiffness: 100});
+    opacity.value = withTiming(1, {duration: 400});
 
-    // Navigate away after 2.5s
+    // Navigate away after 2.0s
     const timer = setTimeout(() => {
       if (!isLoading) {
         if (!hasSeenOnboarding) {
@@ -44,7 +40,6 @@ const SplashScreen = () => {
   }, [hasSeenOnboarding, isLoading, navigation, opacity, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
     opacity: opacity.value,
   }));
 

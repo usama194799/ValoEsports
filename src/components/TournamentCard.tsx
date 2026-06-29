@@ -1,12 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withDelay,
-  withTiming,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Tournament} from '../types';
 import LocationBadge from './LocationBadge';
@@ -31,24 +25,10 @@ const CARD_WIDTH = wp(178);
 const IMAGE_HEIGHT = wp(106);
 
 const TournamentCard: React.FC<TournamentCardProps> = ({item, index, onPress}) => {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(30);
-
-  useEffect(() => {
-    opacity.value = withDelay(index * 100, withTiming(1, {duration: 500}));
-    translateY.value = withDelay(index * 100, withSpring(0, {damping: 15}));
-  }, [index, opacity, translateY]);
-
-  const slideStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{translateY: translateY.value}],
-  }));
-
   const imageSource = useMemo(() => ({uri: item.image}), [item.image]);
 
   return (
-    <Animated.View style={slideStyle}>
-      <AnimatedPressable onPress={onPress} style={[styles.card, Shadows.card]}>
+    <AnimatedPressable onPress={onPress} style={[styles.card, Shadows.card]}>
         {/* Image */}
         <View style={styles.imageContainer}>
           <Animated.Image
@@ -87,7 +67,6 @@ const TournamentCard: React.FC<TournamentCardProps> = ({item, index, onPress}) =
           </View>
         </View>
       </AnimatedPressable>
-    </Animated.View>
   );
 };
 

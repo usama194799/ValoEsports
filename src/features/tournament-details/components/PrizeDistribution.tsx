@@ -34,9 +34,7 @@ const PrizeDistribution: React.FC<PrizeDistributionProps> = ({prizes}) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}>
         {prizes.map((prize, index) => (
-          <Animated.View
-            key={prize.position}
-            entering={FadeInRight.delay(index * 100).springify()}>
+          <View key={index}>
             <CardContainer style={styles.card}>
               <View
                 style={[
@@ -59,7 +57,7 @@ const PrizeDistribution: React.FC<PrizeDistributionProps> = ({prizes}) => {
                 <Label style={styles.type}>{prize.type}</Label>
               </View>
             </CardContainer>
-          </Animated.View>
+          </View>
         ))}
       </ScrollView>
     </SectionContainer>

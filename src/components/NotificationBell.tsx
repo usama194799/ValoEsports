@@ -3,8 +3,7 @@ import {StyleSheet, View, Pressable} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
-  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Colors} from '../theme/colors';
@@ -19,21 +18,18 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   unreadCount = 2,
   onPress,
 }) => {
-  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
 
   const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.85, {damping: 10, stiffness: 200});
-  }, [scale]);
+    opacity.value = withTiming(0.7, {duration: 100});
+  }, [opacity]);
 
   const handlePressOut = useCallback(() => {
-    scale.value = withSequence(
-      withSpring(1.1, {damping: 10, stiffness: 200}),
-      withSpring(1, {damping: 15, stiffness: 300}),
-    );
-  }, [scale]);
+    opacity.value = withTiming(1, {duration: 100});
+  }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
+    opacity: opacity.value,
   }));
 
   return (

@@ -1,13 +1,5 @@
 import React, {useEffect, useMemo} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withDelay,
-  withTiming,
-  withSpring,
-} from 'react-native-reanimated';
-import {LeaderPlayer} from '../types';
 import {Heading, Label, Subheading, Caption} from './Typography';
 import {Colors} from '../theme/colors';
 import {Radius} from '../theme/radius';
@@ -33,23 +25,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({item, index}) => {
       ? `${(item.points / 1000).toFixed(1)}k`
       : `${item.points}`;
 
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
-
-  useEffect(() => {
-    opacity.value = withDelay(index * 100 + 300, withTiming(1, {duration: 400}));
-    translateY.value = withDelay(index * 100 + 300, withSpring(0, {damping: 15}));
-  }, [index, opacity, translateY]);
-
-  const slideStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{translateY: translateY.value}],
-  }));
-
   const imageSource = useMemo(() => ({uri: item.avatar}), [item.avatar]);
 
   return (
-    <Animated.View style={[styles.card, Shadows.card, slideStyle]}>
+    <View style={[styles.card, Shadows.card]}>
       {/* Avatar with rank badge */}
       <View style={styles.avatarContainer}>
         <Image
@@ -79,7 +58,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({item, index}) => {
           <Label style={styles.statLabel}>Games</Label>
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

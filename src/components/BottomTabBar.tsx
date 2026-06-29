@@ -3,9 +3,7 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
-  withSequence,
-  withDelay,
+  withTiming,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
@@ -40,26 +38,44 @@ interface NavigationItemProps {
 
 const NavigationItem: React.FC<NavigationItemProps> = React.memo(({item, isActive, onPress}) => {
   const color = isActive ? Colors.nav.active : Colors.nav.inactive;
+  const progress = useSharedValue(isActive ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(isActive ? 1 : 0, {duration: 250});
+  }, [isActive, progress]);
+
+  const animatedIconStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{scale: 1 + progress.value * 0.08}],
+    };
+  });
+
+  const animatedLabelStyle = useAnimatedStyle(() => {
+    return {
+      opacity: 0.7 + progress.value * 0.3,
+    };
+  });
 
   return (
     <TouchableOpacity
       style={styles.tabItem}
       onPress={() => onPress(item.name)}
       activeOpacity={0.7}>
-      <View style={styles.iconContainer}>
+      <Animated.View style={[styles.iconContainer, animatedIconStyle]}>
         {item.iconLib === 'ion' ? (
           <Ionicons name={item.icon} size={22} color={color} />
         ) : (
           <Icon name={item.icon} size={22} color={color} />
         )}
-      </View>
-      <Text
+      </Animated.View>
+      <Animated.Text
         style={[
           styles.tabLabel,
           {color},
+          animatedLabelStyle,
         ]}>
         {item.label}
-      </Text>
+      </Animated.Text>
       {isActive && <View style={styles.activeDot} />}
     </TouchableOpacity>
   );
@@ -68,15 +84,6 @@ const NavigationItem: React.FC<NavigationItemProps> = React.memo(({item, isActiv
 const BottomTabBar: React.FC<BottomTabBarProps> = ({state, navigation}) => {
   const insets = useSafeAreaInsets();
   const fabScale = useSharedValue(1);
-  const translateY = useSharedValue(100);
-
-  useEffect(() => {
-    translateY.value = withDelay(400, withSpring(0, {damping: 14, stiffness: 90}));
-  }, [translateY]);
-
-  const slideStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: translateY.value}],
-  }));
 
   const fabStyle = useAnimatedStyle(() => ({
     transform: [{scale: fabScale.value}],
@@ -86,22 +93,15 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({state, navigation}) => {
 
   const handleTabPress = useCallback(
     (routeName: string) => {
-      if (routeName === ROUTES.LEADERBOARD_TAB) {
-        fabScale.value = withSequence(
-          withSpring(0.88, AnimationConfig.spring.snappy),
-          withSpring(1, AnimationConfig.spring.bouncy),
-        );
-      }
       navigation.navigate(routeName);
     },
-    [fabScale, navigation],
+    [navigation],
   );
 
   return (
     <Animated.View
       style={[
         styles.container,
-        slideStyle,
         {paddingBottom: insets.bottom > 0 ? insets.bottom : Spacing.md},
       ]}>
       {/* Left side tabs */}

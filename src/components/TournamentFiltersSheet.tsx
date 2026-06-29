@@ -3,7 +3,6 @@ import {StyleSheet, TouchableOpacity, View, ScrollView} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
   interpolate,
 } from 'react-native-reanimated';
@@ -55,11 +54,11 @@ const TournamentFiltersSheet: React.FC<TournamentFiltersSheetProps> = ({
 
   useEffect(() => {
     if (visible) {
-      opacity.value = withTiming(1, {duration: 200});
-      translateY.value = withSpring(0, {damping: 20, stiffness: 150});
+      opacity.value = withTiming(1, {duration: 150});
+      translateY.value = withTiming(0, {duration: 200});
     } else {
-      opacity.value = withTiming(0, {duration: 200});
-      translateY.value = withTiming(1000, {duration: 300});
+      opacity.value = withTiming(0, {duration: 150});
+      translateY.value = withTiming(1000, {duration: 200});
     }
   }, [visible, opacity, translateY]);
 
