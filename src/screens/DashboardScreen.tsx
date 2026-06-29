@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
+import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
