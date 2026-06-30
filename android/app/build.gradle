@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.mytelehouseisp"
+    namespace "com.muxarenamaster"
     defaultConfig {
-        applicationId "com.mytelehouseisp"
+        applicationId "com.muxarenamaster"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
