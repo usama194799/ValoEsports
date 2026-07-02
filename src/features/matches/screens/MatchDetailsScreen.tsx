@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -19,7 +19,8 @@ import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { Heading, Label, Subheading } from '../../../components/Typography';
 
-import { MOCK_MATCH_DETAILS, MOCK_MATCHES } from '../constants/mockData';
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.MATCH_DETAILS_MODAL
@@ -34,8 +35,34 @@ const MatchDetailsScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
   const { matchId } = route.params;
 
-  const match = MOCK_MATCHES.find(m => m.id === matchId) || MOCK_MATCHES[0];
-  const details = MOCK_MATCH_DETAILS;
+  const [loading, setLoading] = useState(true);
+  const [match, setMatch] = useState<any>(null);
+  const [details, setDetails] = useState<any>({
+    captainA: 'Unknown',
+    captainB: 'Unknown',
+    serverRegion: 'NA',
+    mapPool: ['Ascent', 'Bind'],
+    referee: 'Auto-Admin',
+    rules: 'Standard VCT',
+  });
+
+  useEffect(() => {
+    const fetchMatch = async () => {
+      try {
+        const data = await matchService.getMatchById(matchId);
+        setMatch(data);
+        // If data contains details, update details state. Otherwise keep defaults.
+        if (data?.details) {
+          setDetails(data.details);
+        }
+      } catch (error) {
+        console.error('Failed to load match details', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMatch();
+  }, [matchId]);
 
   const renderInfoRow = (label: string, value: string) => (
     <View style={styles.infoRow}>
@@ -43,6 +70,25 @@ const MatchDetailsScreen: React.FC = () => {
       <Subheading style={styles.infoValue}>{value}</Subheading>
     </View>
   );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Icon name="close" size={24} color={Colors.text.primary} />
+          </TouchableOpacity>
+          <Heading style={styles.headerTitle}>Match Details</Heading>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!match) return null;
 
   return (
     <SafeAreaView style={styles.root}>

@@ -5,7 +5,7 @@ import { AuthNavigator } from '../features/auth/navigation/AuthNavigator';
 import { useAuth } from '../features/auth/hooks/useAuth';
 
 const AppNavigator = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <NavigationContainer>

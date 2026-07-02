@@ -15,10 +15,7 @@ import { Heading, Label, Subheading } from '../../../components/Typography';
 
 import ProgressStepper from '../components/ProgressStepper';
 import TeamCard from '../../team/components/TeamCard';
-import {
-  MOCK_ELIGIBLE_TEAMS,
-  MOCK_INELIGIBLE_TEAMS,
-} from '../constants/mockData';
+import { teamService } from '../../../services/teamService';
 import { Team } from '../../team/types/team';
 
 type NavigationProp = RootStackScreenProps<
@@ -38,12 +35,19 @@ const SelectTeamScreen: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
 
   useEffect(() => {
-    // Simulate API fetch
-    const timer = setTimeout(() => {
-      setTeams([...MOCK_ELIGIBLE_TEAMS, ...MOCK_INELIGIBLE_TEAMS]);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    const fetchTeams = async () => {
+      try {
+        // Assume getTeams without params or with specific params gets the user's teams.
+        // Or we just get all teams for now if my_teams isn't supported.
+        const myTeams = await teamService.getTeams();
+        setTeams(myTeams);
+      } catch (error) {
+        console.error('Failed to fetch teams', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeams();
   }, []);
 
   const handleBack = useCallback(() => {

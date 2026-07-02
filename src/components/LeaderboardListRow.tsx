@@ -9,6 +9,7 @@ import { Spacing } from '../theme/spacing';
 
 interface LeaderboardListRowProps {
   player: LeaderPlayer;
+  metric: 'ranking' | 'xp' | 'wins' | 'country';
 }
 
 const getRankColors = (rank: number) => {
@@ -24,13 +25,11 @@ const getRankColors = (rank: number) => {
   }
 };
 
-const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({ player }) => {
+const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({ player, metric }) => {
   const { bg: bgColor, text: textColor } = getRankColors(player.rank);
 
-  const formattedPoints =
-    player.points >= 1000
-      ? `${(player.points / 1000).toFixed(1)}k`
-      : `${player.points}`;
+  const formatPoints = (p: number) =>
+    p >= 1000 ? `${(p / 1000).toFixed(1)}k` : `${p}`;
 
   return (
     <View style={[styles.row, { backgroundColor: bgColor }, Shadows.card]}>
@@ -46,25 +45,29 @@ const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({ player }) => {
         </View>
       </View>
 
-      {/* Team Info */}
       <View style={styles.teamInfo}>
-        <Subheading style={[styles.teamName, { color: textColor }]}>
-          {player.teamName}
+        <Subheading style={[styles.teamName, { color: textColor }]} numberOfLines={1}>
+          {player.name}
         </Subheading>
         <Caption
           style={[
             styles.teamLabel,
             { color: Colors.neutral.whiteTransparent.max },
           ]}
+          numberOfLines={1}
         >
-          {player.teamLabel}
+          {player.label}
         </Caption>
       </View>
 
-      {/* Matches */}
+      {/* Middle Column (Level/Wins/Matches) */}
       <View style={styles.matchesCol}>
         <Heading style={[styles.matchesValue, { color: textColor }]}>
-          {player.games}
+          {metric === 'xp'
+            ? Math.floor((player.xp || player.points) / 1000)
+            : metric === 'wins'
+            ? player.wins || player.games
+            : player.games}
         </Heading>
         <Label
           style={[
@@ -72,15 +75,19 @@ const LeaderboardListRow: React.FC<LeaderboardListRowProps> = ({ player }) => {
             { color: Colors.neutral.whiteTransparent.max },
           ]}
         >
-          Match
+          {metric === 'xp' ? 'Lvl' : metric === 'wins' ? 'Wins' : 'Match'}
         </Label>
       </View>
 
-      {/* Rating */}
+      {/* Right Column (Rating/XP/Country) */}
       <View style={styles.ratingCol}>
         <View style={styles.ratingBadge}>
           <Label style={[styles.ratingValue, { color: textColor }]}>
-            {formattedPoints}
+            {metric === 'xp'
+              ? formatPoints(player.xp || player.points)
+              : metric === 'country'
+              ? player.countryCode || player.country?.substring(0, 3)?.toUpperCase() || 'GLB'
+              : formatPoints(player.points)}
           </Label>
         </View>
       </View>

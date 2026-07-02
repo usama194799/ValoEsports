@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import {
   useNavigation,
@@ -18,11 +18,11 @@ import { Radius } from '../../../theme/radius';
 import { Heading } from '../../../components/Typography';
 
 import SuccessCard from '../components/SuccessCard';
-import {
-  REGISTRATION_TOURNAMENT_DETAILS,
-  MOCK_ELIGIBLE_TEAMS,
-  MOCK_INELIGIBLE_TEAMS,
-} from '../constants/mockData';
+import { tournamentService } from '../../../services/tournamentService';
+import { teamService } from '../../../services/teamService';
+import { Tournament } from '../../../types';
+import { Team } from '../../team/types/team';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.REGISTRATION_SUCCESS
@@ -35,13 +35,29 @@ type ScreenRouteProp = RouteProp<
 const RegistrationSuccessScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
-  const { teamId } = route.params;
+  const { tournamentId, teamId } = route.params;
 
-  const tournament = REGISTRATION_TOURNAMENT_DETAILS;
-  const team = useMemo(() => {
-    const allTeams = [...MOCK_ELIGIBLE_TEAMS, ...MOCK_INELIGIBLE_TEAMS];
-    return allTeams.find(t => t.id === teamId);
-  }, [teamId]);
+  const [tournament, setTournament] = useState<Tournament | null>(null);
+  const [team, setTeam] = useState<Team | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tournData, teamData] = await Promise.all([
+          tournamentService.getTournamentById(tournamentId),
+          teamService.getTeamById(teamId),
+        ]);
+        if (tournData) setTournament(tournData);
+        if (teamData) setTeam(teamData as any);
+      } catch (error) {
+        console.error('Failed to load data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [tournamentId, teamId]);
 
   const handleBackToDashboard = useCallback(() => {
     navigation.dispatch(
@@ -55,15 +71,25 @@ const RegistrationSuccessScreen: React.FC = () => {
   const handleViewTournament = useCallback(() => {
     // Navigate to tournament details, removing the registration flow from the stack
     navigation.navigate(ROUTES.TOURNAMENT_DETAILS, {
-      tournamentId: tournament.id,
+      tournamentId: tournament?.id || tournamentId,
     });
-  }, [navigation, tournament.id]);
+  }, [navigation, tournament, tournamentId]);
 
   const handleShare = useCallback(() => {
     console.log('Share registration');
   }, []);
 
-  if (!team) return null;
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!team || !tournament) return null;
 
   return (
     <SafeAreaView style={styles.root}>

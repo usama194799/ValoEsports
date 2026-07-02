@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -17,29 +19,80 @@ import { Colors } from '../../../theme/colors';
 import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { useTeamData } from '../hooks/useTeamData';
+import { teamService } from '../../../services/teamService';
+import { Game } from '../../../types';
 
 const CreateTeamScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { gamesList, regionsList } = useTeamData();
 
+  const [games, setGames] = useState<Game[]>([]);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [form, setForm] = useState({
     name: '',
     shortTag: '',
     description: '',
-    game: gamesList[0],
+    game: null as Game | null,
     region: regionsList[0],
     privacy: 'public',
   });
 
-  const updateForm = (key: string, value: string) => {
+  useEffect(() => {
+    const initData = async () => {
+      try {
+        const data = await gamesList();
+        setGames(data);
+        if (data.length > 0) {
+          setForm(prev => ({ ...prev, game: data[0] }));
+        }
+      } catch (e) {
+        console.error('Failed to load games', e);
+      } finally {
+        setLoadingInitial(false);
+      }
+    };
+    initData();
+  }, []);
+
+  const updateForm = (key: string, value: any) => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleCreate = useCallback(() => {
-    // Simulate creation and go back
-    navigation.goBack();
-  }, [navigation]);
+  const handleCreate = useCallback(async () => {
+    if (!form.name || !form.shortTag || !form.game) {
+      Alert.alert('Error', 'Please fill in all required fields.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await teamService.createTeam({
+        name: form.name,
+        tag: form.shortTag,
+        description: form.description,
+        game_id: form.game.id,
+        region: form.region.id,
+        privacy: form.privacy,
+      });
+      navigation.goBack();
+    } catch (e: any) {
+      console.error('Failed to create team', e);
+      Alert.alert('Error', e?.response?.data?.message || 'Failed to create team.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [form, navigation]);
+
+  if (loadingInitial) {
+    return (
+      <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.primary.main} />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -82,7 +135,7 @@ const CreateTeamScreen = () => {
         {/* Form Fields */}
         <View style={styles.formSection}>
           <View style={styles.inputGroup}>
-            <Label style={styles.inputLabel}>Team Name</Label>
+            <Label style={styles.inputLabel}>Team Name *</Label>
             <View style={styles.inputWrapper}>
               <TextInput
                 style={styles.input}
@@ -95,125 +148,157 @@ const CreateTeamScreen = () => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Label style={styles.inputLabel}>Short Tag</Label>
+            <Label style={styles.inputLabel}>Short Tag *</Label>
             <View style={styles.inputWrapper}>
               <TextInput
                 style={styles.input}
-                placeholder="e.g. C9"
+                placeholder="e.g. MUX"
                 placeholderTextColor={Colors.text.muted}
-                maxLength={4}
                 value={form.shortTag}
-                onChangeText={v => updateForm('shortTag', v)}
+                onChangeText={v => updateForm('shortTag', v.toUpperCase())}
+                maxLength={4}
+                autoCapitalize="characters"
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
-            <Label style={styles.inputLabel}>Description</Label>
+            <Label style={styles.inputLabel}>About (Optional)</Label>
             <View style={[styles.inputWrapper, { height: 100 }]}>
               <TextInput
                 style={[styles.input, { textAlignVertical: 'top' }]}
-                placeholder="Tell us about your team..."
+                placeholder="Describe your team..."
                 placeholderTextColor={Colors.text.muted}
-                multiline
-                numberOfLines={4}
                 value={form.description}
                 onChangeText={v => updateForm('description', v)}
+                multiline
               />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <Label style={styles.inputLabel}>Primary Game</Label>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chipScroll}
-            >
-              {gamesList.map(game => (
-                <TouchableOpacity
-                  key={game}
-                  style={[styles.chip, form.game === game && styles.chipActive]}
-                  onPress={() => updateForm('game', game)}
-                >
-                  <Label
-                    style={[
-                      styles.chipText,
-                      form.game === game && styles.chipTextActive,
-                    ]}
-                  >
-                    {game}
-                  </Label>
-                </TouchableOpacity>
-              ))}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.chipRow}>
+                {games.map(game => {
+                  const isSelected = form.game?.id === game.id;
+                  return (
+                    <TouchableOpacity
+                      key={game.id}
+                      style={[styles.chip, isSelected && styles.chipActive]}
+                      onPress={() => updateForm('game', game)}
+                    >
+                      <Label
+                        style={[
+                          styles.chipLabel,
+                          isSelected && styles.chipLabelActive,
+                        ]}
+                      >
+                        {game.name}
+                      </Label>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Label style={styles.inputLabel}>Region</Label>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.chipRow}>
+                {regionsList.map(r => {
+                  const isSelected = form.region.id === r.id;
+                  return (
+                    <TouchableOpacity
+                      key={r.id}
+                      style={[styles.chip, isSelected && styles.chipActive]}
+                      onPress={() => updateForm('region', r)}
+                    >
+                      <Label
+                        style={[
+                          styles.chipLabel,
+                          isSelected && styles.chipLabelActive,
+                        ]}
+                      >
+                        {r.name}
+                      </Label>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </ScrollView>
           </View>
 
           <View style={styles.inputGroup}>
             <Label style={styles.inputLabel}>Privacy</Label>
-            <View style={styles.row}>
+            <View style={styles.chipRow}>
               <TouchableOpacity
                 style={[
-                  styles.radioBtn,
-                  form.privacy === 'public' && styles.radioBtnActive,
+                  styles.chip,
+                  form.privacy === 'public' && styles.chipActive,
                 ]}
                 onPress={() => updateForm('privacy', 'public')}
               >
                 <Icon
                   name="earth"
-                  size={20}
+                  size={16}
                   color={
                     form.privacy === 'public'
-                      ? Colors.primary.main
+                      ? Colors.text.primary
                       : Colors.text.muted
                   }
                 />
-                <Subheading
+                <Label
                   style={[
-                    styles.radioText,
-                    form.privacy === 'public' && styles.radioTextActive,
+                    styles.chipLabel,
+                    form.privacy === 'public' && styles.chipLabelActive,
                   ]}
                 >
                   Public
-                </Subheading>
+                </Label>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
-                  styles.radioBtn,
-                  form.privacy === 'private' && styles.radioBtnActive,
+                  styles.chip,
+                  form.privacy === 'private' && styles.chipActive,
                 ]}
                 onPress={() => updateForm('privacy', 'private')}
               >
                 <Icon
                   name="lock-outline"
-                  size={20}
+                  size={16}
                   color={
                     form.privacy === 'private'
-                      ? Colors.primary.main
+                      ? Colors.text.primary
                       : Colors.text.muted
                   }
                 />
-                <Subheading
+                <Label
                   style={[
-                    styles.radioText,
-                    form.privacy === 'private' && styles.radioTextActive,
+                    styles.chipLabel,
+                    form.privacy === 'private' && styles.chipLabelActive,
                   ]}
                 >
                   Private
-                </Subheading>
+                </Label>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      </ScrollView>
 
-      <View
-        style={[styles.footer, { paddingBottom: insets.bottom || Spacing.lg }]}
-      >
-        <TouchableOpacity style={styles.createBtn} onPress={handleCreate}>
-          <Subheading style={styles.createText}>Create Team</Subheading>
+        <TouchableOpacity 
+          style={[styles.submitBtn, isSubmitting && { opacity: 0.7 }]} 
+          onPress={handleCreate}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+             <ActivityIndicator color={Colors.text.primary} />
+          ) : (
+            <Heading style={styles.submitBtnText}>Create Team</Heading>
+          )}
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -229,140 +314,112 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
-    backgroundColor: Colors.dark.surface,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.neutral.border,
+    backgroundColor: Colors.dark.surface,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+    padding: Spacing.xs,
   },
   headerTitle: {
     fontSize: 18,
   },
   scrollContent: {
-    paddingBottom: Spacing.xxl * 2,
+    paddingBottom: Spacing.xxl,
   },
   uploadSection: {
-    height: 240,
-    position: 'relative',
     marginBottom: Spacing.xl,
   },
   bannerUpload: {
-    height: 200,
+    height: 120,
     backgroundColor: Colors.dark.surfaceLight,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   uploadText: {
-    color: Colors.text.muted,
     marginTop: Spacing.xs,
+    color: Colors.text.muted,
   },
   logoUploadWrapper: {
     position: 'absolute',
-    bottom: 0,
-    left: Spacing.xl,
-    width: 80,
-    height: 80,
-    borderRadius: Radius.lg,
-    borderWidth: 4,
-    borderColor: Colors.dark.background,
-    backgroundColor: Colors.dark.surface,
+    bottom: -40,
+    left: Spacing.lg,
+    padding: 4,
+    backgroundColor: Colors.dark.background,
+    borderRadius: Radius.full,
   },
   logoUpload: {
-    flex: 1,
-    alignItems: 'center',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.dark.surfaceLight,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.neutral.borderLight,
   },
   formSection: {
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xl,
+    gap: Spacing.lg,
   },
   inputGroup: {
-    marginBottom: Spacing.lg,
+    gap: Spacing.xs,
   },
   inputLabel: {
     color: Colors.text.secondary,
-    marginBottom: Spacing.sm,
+    marginLeft: Spacing.xs,
   },
   inputWrapper: {
     backgroundColor: Colors.dark.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
+    borderColor: Colors.neutral.border,
     height: 48,
     paddingHorizontal: Spacing.md,
   },
   input: {
     flex: 1,
     color: Colors.text.primary,
-    fontSize: 14,
+    fontSize: 16,
   },
-  chipScroll: {
+  chipRow: {
+    flexDirection: 'row',
     gap: Spacing.sm,
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    backgroundColor: Colors.dark.surface,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.dark.surface,
     borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
+    borderColor: Colors.neutral.border,
   },
   chipActive: {
-    backgroundColor: Colors.primary.transparent.light,
+    backgroundColor: Colors.primary.glow,
     borderColor: Colors.primary.main,
   },
-  chipText: {
-    color: Colors.text.secondary,
+  chipLabel: {
+    color: Colors.text.muted,
   },
-  chipTextActive: {
-    color: Colors.primary.main,
-    fontWeight: '600',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  radioBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 48,
-    backgroundColor: Colors.dark.surface,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
-    gap: Spacing.sm,
-  },
-  radioBtnActive: {
-    borderColor: Colors.primary.main,
-    backgroundColor: 'rgba(232, 33, 74, 0.05)',
-  },
-  radioText: {
-    color: Colors.text.secondary,
-  },
-  radioTextActive: {
+  chipLabelActive: {
     color: Colors.primary.main,
   },
-  footer: {
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.md,
-    backgroundColor: Colors.dark.surface,
-    borderTopWidth: 0.5,
-    borderTopColor: Colors.neutral.border,
-  },
-  createBtn: {
-    height: 48,
+  submitBtn: {
     backgroundColor: Colors.primary.main,
+    marginHorizontal: Spacing.lg,
+    marginTop: Spacing.xxl,
+    height: 56,
     borderRadius: Radius.md,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  createText: {
+  submitBtnText: {
     color: Colors.text.primary,
-    fontWeight: '700',
+    fontSize: 16,
   },
 });
 

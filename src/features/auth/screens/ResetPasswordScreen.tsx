@@ -76,7 +76,7 @@ const ResetPasswordScreen = () => {
     return (
       <View style={styles.strengthContainer}>
         {[1, 2, 3, 4].map(level => {
-          let bgColor = Colors.dark.surface;
+          let bgColor: string = Colors.dark.surface;
           if (strength >= level) {
             if (strength <= 2) bgColor = Colors.danger.main;
             else if (strength === 3) bgColor = Colors.warning.main;

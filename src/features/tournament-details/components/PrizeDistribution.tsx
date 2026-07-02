@@ -13,7 +13,8 @@ interface PrizeDistributionProps {
   prizes: PrizeReward[];
 }
 
-const getRankColor = (position: number) => {
+const getRankColor = (position: number | string) => {
+  if (typeof position === 'string') return Colors.text.muted;
   switch (position) {
     case 1:
       return Colors.gaming.rankGold;
@@ -56,7 +57,7 @@ const PrizeDistribution: React.FC<PrizeDistributionProps> = ({ prizes }) => {
 
               <View style={styles.infoContainer}>
                 <Subheading style={styles.amount}>{prize.amount}</Subheading>
-                <Label style={styles.type}>{prize.type}</Label>
+                <Label style={styles.type}>{prize.label}</Label>
               </View>
             </CardContainer>
           </View>

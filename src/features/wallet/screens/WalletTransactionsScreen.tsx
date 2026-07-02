@@ -114,8 +114,8 @@ const WalletTransactionsScreen: React.FC = () => {
       <View style={styles.filtersContainer}>
         <CategoryChips
           categories={FILTERS}
-          activeCategory={activeFilter}
-          onSelectCategory={setActiveFilter}
+          selectedCategory={activeFilter}
+          onSelect={setActiveFilter}
         />
       </View>
 

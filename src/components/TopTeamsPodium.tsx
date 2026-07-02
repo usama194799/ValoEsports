@@ -10,12 +10,15 @@ import { Spacing } from '../theme/spacing';
 
 interface TopTeamsPodiumProps {
   topPlayers: LeaderPlayer[];
+  category: 'players' | 'teams';
+  metric: 'ranking' | 'xp' | 'wins' | 'country';
 }
 
 const PodiumItem: React.FC<{
   player: LeaderPlayer;
   position: 'center' | 'left' | 'right';
-}> = ({ player, position }) => {
+  metric: 'ranking' | 'xp' | 'wins' | 'country';
+}> = ({ player, position, metric }) => {
   const isCenter = position === 'center';
   const size = isCenter ? 96 : 72;
   const borderWidth = 2;
@@ -64,22 +67,29 @@ const PodiumItem: React.FC<{
         </View>
       </View>
       <View style={styles.infoWrapper}>
-        {isCenter ? (
-          <Heading style={[styles.name, { color: nameColor }]}>
-            {player.teamName}
+        <View style={styles.teamInfo}>
+          <Heading style={[styles.teamName, { color: nameColor }]} numberOfLines={1}>
+            {player.name}
           </Heading>
-        ) : (
-          <Subheading style={[styles.name, { color: nameColor }]}>
-            {player.teamName}
-          </Subheading>
-        )}
-        <Caption style={styles.points}>{player.points}pts</Caption>
+          <Caption style={styles.teamLabel} numberOfLines={1}>
+            {player.label}
+          </Caption>
+        </View>
+        <Caption style={styles.points}>
+          {metric === 'xp'
+            ? `${player.xp || player.points} XP`
+            : metric === 'wins'
+            ? `${player.wins || player.games} Wins`
+            : metric === 'country'
+            ? player.country || 'Global'
+            : `${player.points} pts`}
+        </Caption>
       </View>
     </View>
   );
 };
 
-const TopTeamsPodium: React.FC<TopTeamsPodiumProps> = ({ topPlayers }) => {
+const TopTeamsPodium: React.FC<TopTeamsPodiumProps> = ({ topPlayers, category, metric }) => {
   if (!topPlayers || topPlayers.length < 3) return null;
 
   // Assuming topPlayers is already sorted by rank 1, 2, 3
@@ -94,12 +104,14 @@ const TopTeamsPodium: React.FC<TopTeamsPodiumProps> = ({ topPlayers }) => {
         colors={['#1E1E30', '#151525', '#10101A']}
         style={styles.gradientBg}
       />
-      <Heading style={styles.title}>Top Teams</Heading>
+      <Heading style={styles.title}>
+        {category === 'players' ? 'Top Players' : 'Top Teams'}
+      </Heading>
 
       <View style={styles.podiumRow}>
-        <PodiumItem player={rank2} position="left" />
-        <PodiumItem player={rank1} position="center" />
-        <PodiumItem player={rank3} position="right" />
+        <PodiumItem player={rank2} position="left" metric={metric} />
+        <PodiumItem player={rank1} position="center" metric={metric} />
+        <PodiumItem player={rank3} position="right" metric={metric} />
       </View>
     </View>
   );
@@ -177,10 +189,22 @@ const styles = StyleSheet.create({
   },
   infoWrapper: {
     alignItems: 'center',
+    width: '100%',
   },
-  name: {
+  teamInfo: {
+    alignItems: 'center',
+    marginBottom: 4,
+    paddingHorizontal: 4,
+  },
+  teamName: {
     marginBottom: 2,
     textAlign: 'center',
+    fontSize: 14,
+  },
+  teamLabel: {
+    textAlign: 'center',
+    fontSize: 11,
+    color: Colors.neutral.whiteTransparent.max,
   },
   points: {
     color: Colors.text.muted,

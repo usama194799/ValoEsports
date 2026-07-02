@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,7 +19,8 @@ import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { Heading, Subheading, Label } from '../../../components/Typography';
 
-import { REGISTRATION_TOURNAMENT_DETAILS } from '../constants/mockData';
+import { tournamentService } from '../../../services/tournamentService';
+import { Tournament } from '../../../types';
 import ProgressStepper from '../components/ProgressStepper';
 import RegistrationCard from '../components/RegistrationCard';
 import RequirementItem from '../components/RequirementItem';
@@ -26,20 +28,72 @@ import RequirementItem from '../components/RequirementItem';
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.REGISTRATION_OVERVIEW
 >['navigation'];
+type RoutePropType = RouteProp<RootStackParamList, typeof ROUTES.REGISTRATION_OVERVIEW>;
 
 const RegistrationOverviewScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const tournament = REGISTRATION_TOURNAMENT_DETAILS;
+  const route = useRoute<RoutePropType>();
+  const { tournamentId } = route.params;
+
+  const [tournament, setTournament] = useState<Tournament | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTournament = async () => {
+      try {
+        const data = await tournamentService.getTournamentById(tournamentId);
+        if (data) {
+          setTournament(data);
+        }
+      } catch (error) {
+        console.error('Failed to load tournament', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTournament();
+  }, [tournamentId]);
 
   const handleContinue = useCallback(() => {
-    navigation.navigate(ROUTES.SELECT_TEAM_REGISTRATION, {
-      tournamentId: tournament.id,
-    });
-  }, [navigation, tournament.id]);
+    if (tournament) {
+      navigation.navigate(ROUTES.SELECT_TEAM_REGISTRATION, {
+        tournamentId: tournament.id,
+      });
+    }
+  }, [navigation, tournament]);
 
   const handleBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
+
+  if (loading || !tournament) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
+            <Icon name="arrow-left" size={24} color={Colors.text.primary} />
+          </TouchableOpacity>
+          <Heading style={styles.headerTitle}>Registration</Heading>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Fallbacks if backend doesn't provide these
+  const rulesSummary = [
+    'All players must be 16 years or older.',
+    'Teams must have exactly 5 active players and up to 2 reserves.',
+    'Use of third-party software is strictly prohibited.',
+  ];
+  
+  const requirements = [
+    { id: 'req_1', label: 'Minimum 5 Members', type: 'member_count' },
+    { id: 'req_2', label: 'No banned accounts', type: 'account_status' },
+  ];
 
   return (
     <SafeAreaView style={styles.root}>
@@ -57,12 +111,12 @@ const RegistrationOverviewScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <RegistrationCard tournament={tournament} />
+        <RegistrationCard tournament={tournament as any} />
 
         <View style={styles.section}>
           <Heading style={styles.sectionTitle}>Rules Summary</Heading>
           <View style={styles.rulesContainer}>
-            {tournament.rulesSummary.map((rule, index) => (
+            {rulesSummary.map((rule, index) => (
               <View key={`rule_${index}`} style={styles.ruleItem}>
                 <View style={styles.bullet} />
                 <Subheading style={styles.ruleText}>{rule}</Subheading>
@@ -74,11 +128,11 @@ const RegistrationOverviewScreen: React.FC = () => {
         <View style={styles.section}>
           <Heading style={styles.sectionTitle}>Tournament Requirements</Heading>
           <View style={styles.reqContainer}>
-            {tournament.requirements.map(req => (
+            {requirements.map(req => (
               <RequirementItem
                 key={req.id}
                 label={req.label}
-                isMet={true} // Overview screen shows all requirements neutrally, but let's assume they are met visually for now, or we just pass isMet={true} to look good
+                isMet={true}
               />
             ))}
           </View>

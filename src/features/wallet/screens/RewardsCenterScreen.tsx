@@ -48,8 +48,8 @@ const RewardsCenterScreen: React.FC = () => {
       <View style={styles.tabsContainer}>
         <CategoryChips
           categories={TABS}
-          activeCategory={activeTab}
-          onSelectCategory={setActiveTab}
+          selectedCategory={activeTab}
+          onSelect={setActiveTab}
         />
       </View>
 

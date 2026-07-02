@@ -1,34 +1,16 @@
-import { db } from '../data/db';
-import { Game, Match } from '../types';
+import apiClient from '../api/client';
+import { Game } from '../types';
 
 const DELAY_MS = 300;
 
 export const gameService = {
   getGames: async (): Promise<Game[]> => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(db.games);
-      }, DELAY_MS);
-    });
+    const response = await apiClient.get('/games');
+    return response.data?.data || response.data || [];
   },
 
-  getRecentMatches: async (): Promise<Match[]> => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(
-          db.matches.filter(
-            m => m.status === 'completed' || m.status === 'live',
-          ),
-        );
-      }, DELAY_MS);
-    });
-  },
-
-  getUpcomingMatches: async (): Promise<Match[]> => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(db.matches.filter(m => m.status === 'upcoming'));
-      }, DELAY_MS);
-    });
+  getGameById: async (id: string): Promise<Game | undefined> => {
+    const response = await apiClient.get('/games/' + id);
+    return response.data?.data || response.data;
   },
 };

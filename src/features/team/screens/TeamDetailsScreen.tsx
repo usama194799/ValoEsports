@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useState, useEffect } from 'react';
+import { StyleSheet, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,6 +23,7 @@ import {
   CardContainer,
 } from '../../tournament-details/components/LayoutContainers';
 import MemberAvatar from '../components/MemberAvatar';
+import SkeletonDetails from '../../tournament-details/components/SkeletonDetails';
 
 type TeamDetailsRouteProp = any;
 type TeamDetailsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -34,9 +35,31 @@ const TeamDetailsScreen = () => {
   const { getTeamById, getTeamStats, getTeamMembers } = useTeamData();
 
   const teamId = route.params?.teamId;
-  const team = getTeamById(teamId);
-  const stats = getTeamStats(teamId);
-  const members = getTeamMembers(teamId);
+  const [team, setTeam] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [teamData, statsData, membersData] = await Promise.all([
+          getTeamById(teamId),
+          getTeamStats(teamId),
+          getTeamMembers(teamId)
+        ]);
+        setTeam(teamData);
+        setStats(statsData);
+        setMembers(membersData);
+      } catch (e) {
+        console.error('Failed to load team details', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [teamId]);
 
   const scrollY = useSharedValue(0);
 
@@ -62,9 +85,15 @@ const TeamDetailsScreen = () => {
     navigation.navigate(ROUTES.TEAM_SETTINGS, { teamId });
   }, [navigation, teamId]);
 
-  if (!team) return null;
+  if (loading || !team) {
+    return (
+      <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
+         <ActivityIndicator size="large" color={Colors.primary.main} />
+      </View>
+    );
+  }
 
-  const captain = members.find(m => m.role === 'captain');
+  const captain = members.find(m => m.role === 'captain' || m.isOwner) || members[0];
 
   return (
     <View style={styles.root}>
@@ -100,111 +129,177 @@ const TeamDetailsScreen = () => {
           scrollY={scrollY}
         />
 
-        <View style={styles.actionsRow}>
-          <TouchableOpacity
-            style={styles.actionBtnPrimary}
-            onPress={handleInvitePress}
-          >
-            <Icon
-              name="account-plus-outline"
-              size={20}
-              color={Colors.primary.main}
-            />
-            <Label style={styles.actionTextPrimary}>Invite</Label>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionBtnSecondary}
-            onPress={handleEditPress}
-          >
-            <Icon name="pencil-outline" size={20} color={Colors.text.primary} />
-            <Label style={styles.actionTextSecondary}>Edit Team</Label>
-          </TouchableOpacity>
-        </View>
-
-        <SectionContainer title="About">
-          <CardContainer>
-            <Label style={styles.description}>{team.description}</Label>
-            <View style={styles.divider} />
-
-            <View style={styles.infoGrid}>
-              <View style={styles.infoItem}>
-                <Label style={styles.infoLabel}>Country</Label>
-                <Subheading style={styles.infoValue}>{team.country}</Subheading>
-              </View>
-              <View style={styles.infoItem}>
-                <Label style={styles.infoLabel}>Region</Label>
-                <Subheading style={styles.infoValue}>{team.region}</Subheading>
-              </View>
-              <View style={styles.infoItem}>
-                <Label style={styles.infoLabel}>Rank</Label>
-                <Subheading
-                  style={[styles.infoValue, { color: Colors.gaming.rankGold }]}
-                >
-                  #{team.rank}
-                </Subheading>
-              </View>
-              <View style={styles.infoItem}>
-                <Label style={styles.infoLabel}>Level</Label>
-                <Subheading style={styles.infoValue}>{team.level}</Subheading>
-              </View>
-            </View>
-          </CardContainer>
-        </SectionContainer>
-
-        <SectionContainer
-          title="Members"
-          headerRight={
-            <TouchableOpacity onPress={handleMembersPress}>
-              <Label style={styles.viewAllText}>
-                View All ({members.length})
-              </Label>
+        <View style={styles.content}>
+          {/* Action Row */}
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={handleInvitePress}
+            >
+              <Icon
+                name="account-plus-outline"
+                size={20}
+                color={Colors.primary.main}
+              />
+              <Label style={styles.actionText}>Invite</Label>
             </TouchableOpacity>
-          }
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.membersScroll}
-          >
-            {members.slice(0, 5).map(member => (
-              <View key={member.id} style={styles.memberBox}>
-                <MemberAvatar
-                  url={member.avatarUrl}
-                  size={56}
-                  online={member.online}
-                  role={member.role}
-                />
-                <Label style={styles.memberName} numberOfLines={1}>
-                  {member.name}
-                </Label>
-              </View>
-            ))}
-          </ScrollView>
-        </SectionContainer>
 
-        <SectionContainer title="Statistics">
-          <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              <Icon name="sword-cross" size={24} color={Colors.primary.main} />
-              <Heading style={styles.statValue}>{stats.totalMatches}</Heading>
-              <Label style={styles.statLabel}>Matches</Label>
-            </View>
-            <View style={styles.statCard}>
-              <Icon name="percent" size={24} color={Colors.success.main} />
-              <Heading
-                style={[styles.statValue, { color: Colors.success.main }]}
-              >
-                {stats.winRate}%
-              </Heading>
-              <Label style={styles.statLabel}>Win Rate</Label>
-            </View>
-            <View style={styles.statCard}>
-              <Icon name="target" size={24} color={Colors.gaming.rankSilver} />
-              <Heading style={styles.statValue}>{stats.averageScore}</Heading>
-              <Label style={styles.statLabel}>Avg Score</Label>
-            </View>
+            <TouchableOpacity style={styles.actionBtn} onPress={handleEditPress}>
+              <Icon
+                name="pencil-outline"
+                size={20}
+                color={Colors.primary.main}
+              />
+              <Label style={styles.actionText}>Edit</Label>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionBtn}>
+              <Icon name="share-variant" size={20} color={Colors.primary.main} />
+              <Label style={styles.actionText}>Share</Label>
+            </TouchableOpacity>
           </View>
-        </SectionContainer>
+
+          {/* About Section */}
+          <SectionContainer title="About">
+            <CardContainer>
+              <Subheading style={styles.description}>
+                {team.description || 'No description provided.'}
+              </Subheading>
+              <View style={styles.metaRow}>
+                <View style={styles.metaItem}>
+                  <Icon
+                    name="earth"
+                    size={16}
+                    color={Colors.text.secondary}
+                    style={styles.metaIcon}
+                  />
+                  <Label style={styles.metaLabel}>{team.region || 'Global'}</Label>
+                </View>
+                <View style={styles.metaItem}>
+                  <Icon
+                    name="clock-outline"
+                    size={16}
+                    color={Colors.text.secondary}
+                    style={styles.metaIcon}
+                  />
+                  <Label style={styles.metaLabel}>Est. 2024</Label>
+                </View>
+              </View>
+            </CardContainer>
+          </SectionContainer>
+
+          {/* Captain Section */}
+          {captain && (
+            <SectionContainer title="Captain">
+              <CardContainer style={styles.captainCard}>
+                <View style={styles.captainInfo}>
+                  <MemberAvatar
+                    url={captain.avatarUrl || 'https://via.placeholder.com/150'}
+                    size={48}
+                    role="captain"
+                  />
+                  <View style={styles.captainText}>
+                    <Subheading>{captain.username || captain.name || 'Captain'}</Subheading>
+                    <Label style={styles.captainLabel}>Team Leader</Label>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.viewProfileBtn}>
+                  <Label style={styles.viewProfileLabel}>Profile</Label>
+                </TouchableOpacity>
+              </CardContainer>
+            </SectionContainer>
+          )}
+
+          {/* Roster Preview */}
+          <SectionContainer
+            title={`Roster (${members.length})`}
+            headerRight={
+              <TouchableOpacity onPress={handleMembersPress}>
+                <Label style={{ color: Colors.primary.main }}>View All</Label>
+              </TouchableOpacity>
+            }
+          >
+            <CardContainer style={styles.rosterCard}>
+              <View style={styles.rosterList}>
+                {members.slice(0, 5).map((m, idx) => (
+                  <View key={m.id || idx} style={styles.rosterItem}>
+                    <MemberAvatar
+                      url={m.avatarUrl || 'https://via.placeholder.com/150'}
+                      size={40}
+                      role={m.role === 'captain' || m.isOwner ? 'captain' : 'player'}
+                    />
+                    <Label
+                      style={styles.rosterName}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {m.username || m.name || `Player ${idx+1}`}
+                    </Label>
+                  </View>
+                ))}
+              </View>
+            </CardContainer>
+          </SectionContainer>
+
+          {/* Statistics */}
+          {stats && (
+            <SectionContainer title="Team Statistics">
+              <View style={styles.statsGrid}>
+                <CardContainer style={styles.statBox}>
+                  <Heading style={styles.statValue}>
+                    {stats.tournamentsPlayed || 0}
+                  </Heading>
+                  <Label style={styles.statLabel}>Tournaments</Label>
+                </CardContainer>
+                <CardContainer style={styles.statBox}>
+                  <Heading style={styles.statValue}>{stats.winRate || 0}%</Heading>
+                  <Label style={styles.statLabel}>Win Rate</Label>
+                </CardContainer>
+                <CardContainer style={styles.statBox}>
+                  <Heading style={styles.statValue}>
+                    {stats.tournamentsWon || 0}
+                  </Heading>
+                  <Label style={styles.statLabel}>Trophies</Label>
+                </CardContainer>
+                <CardContainer style={styles.statBox}>
+                  <Heading style={styles.statValue}>
+                    ${stats.totalEarnings || 0}
+                  </Heading>
+                  <Label style={styles.statLabel}>Earnings</Label>
+                </CardContainer>
+              </View>
+            </SectionContainer>
+          )}
+
+          {/* Recent Achievements / History */}
+          <SectionContainer title="Recent Matches">
+            {team.achievements && team.achievements.length > 0 ? (
+              team.achievements.map((ach: any) => (
+                <CardContainer key={ach.id} style={styles.achievementCard}>
+                  <View style={styles.achInfo}>
+                    <Subheading>{ach.tournamentName}</Subheading>
+                    <Label style={styles.achDate}>{ach.date}</Label>
+                  </View>
+                  <View style={styles.achResult}>
+                    <Heading
+                      style={[
+                        styles.placement,
+                        ach.placement === 1 && { color: Colors.gaming.rankGold },
+                      ]}
+                    >
+                      #{ach.placement}
+                    </Heading>
+                    <Label style={styles.achPrize}>{ach.prize}</Label>
+                  </View>
+                </CardContainer>
+              ))
+            ) : (
+              <CardContainer style={styles.emptyCard}>
+                <Label style={styles.emptyText}>No recent matches to display.</Label>
+              </CardContainer>
+            )}
+          </SectionContainer>
+        </View>
       </Animated.ScrollView>
     </View>
   );
@@ -219,118 +314,157 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+    zIndex: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.lg,
-    zIndex: 10,
+    paddingHorizontal: Spacing.md,
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.xl,
-    marginTop: Spacing.xl,
-    marginBottom: Spacing.xxl,
-    gap: Spacing.md,
-  },
-  actionBtnPrimary: {
-    flex: 1,
-    height: 48,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.primary.glow,
-    borderRadius: Radius.md,
+  },
+  content: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xl,
+    gap: Spacing.xl,
+  },
+  actionRow: {
+    flexDirection: 'row',
     gap: Spacing.sm,
   },
-  actionTextPrimary: {
-    color: Colors.primary.main,
-    fontWeight: '700',
-  },
-  actionBtnSecondary: {
+  actionBtn: {
     flex: 1,
-    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.dark.surface,
+    gap: Spacing.xs,
+    backgroundColor: Colors.primary.glow,
+    paddingVertical: Spacing.md,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.neutral.border,
-    gap: Spacing.sm,
+    borderColor: 'rgba(255, 75, 75, 0.2)',
   },
-  actionTextSecondary: {
+  actionText: {
+    color: Colors.primary.main,
     fontWeight: '600',
   },
   description: {
     color: Colors.text.secondary,
-    lineHeight: 20,
+    lineHeight: 22,
+    marginBottom: Spacing.md,
   },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.neutral.borderLight,
-    marginVertical: Spacing.lg,
-  },
-  infoGrid: {
+  metaRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.lg,
   },
-  infoItem: {
-    width: '45%',
-  },
-  infoLabel: {
-    color: Colors.text.muted,
-    fontSize: 11,
-    marginBottom: Spacing.xs,
-  },
-  infoValue: {
-    fontSize: 14,
-  },
-  viewAllText: {
-    color: Colors.primary.main,
-    fontWeight: '600',
-  },
-  membersScroll: {
-    gap: Spacing.lg,
-  },
-  memberBox: {
+  metaItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    width: 64,
+    gap: 4,
   },
-  memberName: {
-    fontSize: 11,
-    marginTop: Spacing.sm,
+  metaIcon: {},
+  metaLabel: {
+    color: Colors.text.secondary,
+  },
+  captainCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.md,
+  },
+  captainInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  captainText: {},
+  captainLabel: {
+    color: Colors.text.muted,
+    fontSize: 12,
+  },
+  viewProfileBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.dark.surfaceLight,
+  },
+  viewProfileLabel: {
+    color: Colors.text.primary,
+    fontSize: 12,
+  },
+  rosterCard: {
+    padding: Spacing.md,
+  },
+  rosterList: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  rosterItem: {
+    alignItems: 'center',
+    gap: Spacing.xs,
+    width: 60,
+  },
+  rosterName: {
+    fontSize: 12,
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   statsGrid: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
   },
-  statCard: {
-    flex: 1,
-    backgroundColor: Colors.dark.cardAlt,
-    borderRadius: Radius.lg,
-    padding: Spacing.md,
+  statBox: {
+    width: '48%',
+    padding: Spacing.lg,
     alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: Colors.neutral.borderLight,
+    justifyContent: 'center',
+    gap: Spacing.xs,
   },
   statValue: {
-    fontSize: 20,
-    marginTop: Spacing.sm,
-    marginBottom: 2,
+    color: Colors.text.primary,
   },
   statLabel: {
-    fontSize: 10,
+    color: Colors.text.muted,
+    fontSize: 12,
+  },
+  achievementCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  achInfo: {
+    gap: 4,
+  },
+  achDate: {
+    color: Colors.text.muted,
+    fontSize: 12,
+  },
+  achResult: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  placement: {
+    fontSize: 20,
+    color: Colors.text.primary,
+  },
+  achPrize: {
+    color: Colors.text.success,
+    fontWeight: 'bold',
+  },
+  emptyCard: {
+    padding: Spacing.xl,
+    alignItems: 'center',
+  },
+  emptyText: {
     color: Colors.text.muted,
   },
 });
 
-export default React.memo(TeamDetailsScreen);
+export default TeamDetailsScreen;

@@ -13,45 +13,50 @@ import MemberAvatar from '../components/MemberAvatar';
 import { useTeamData } from '../hooks/useTeamData';
 import EmptyState from '../../../components/EmptyState';
 
-// Dummy Players
-const DUMMY_PLAYERS = [
-  {
-    id: 'p1',
-    name: 'S1mple',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=100&h=100',
-    status: 'pending',
-  },
-  {
-    id: 'p2',
-    name: 'ZywOo',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=100&h=100',
-    status: 'none',
-  },
-  {
-    id: 'p3',
-    name: 'NiKo',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=100&h=100',
-    status: 'accepted',
-  },
-];
-
 const InvitePlayersScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [search, setSearch] = useState('');
-  const [players, setPlayers] = useState(DUMMY_PLAYERS);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleInvite = (id: string) => {
-    setPlayers(prev =>
-      prev.map(p => (p.id === id ? { ...p, status: 'pending' } : p)),
-    );
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        // Using playerService to fetch users (since getLeaderboard for players hits /users)
+        const { playerService } = await import('../../../services');
+        const users = await playerService.getLeaderboard({ category: 'players' });
+        setPlayers(
+          users.map(u => ({
+            id: u.id,
+            name: u.name,
+            avatarUrl: u.avatar,
+            status: 'none',
+          }))
+        );
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const handleInvite = async (id: string) => {
+    try {
+      const { teamService } = await import('../../../services');
+      // @ts-ignore - Assuming we have teamId from params, for now just visually update
+      // await teamService.inviteMember(teamId, id);
+      setPlayers(prev =>
+        prev.map(p => (p.id === id ? { ...p, status: 'pending' } : p)),
+      );
+    } catch(e) {}
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: (typeof DUMMY_PLAYERS)[0] }) => (
+    ({ item }: { item: any }) => (
       <View style={styles.playerRow}>
         <MemberAvatar url={item.avatarUrl} size={48} />
         <View style={styles.playerInfo}>

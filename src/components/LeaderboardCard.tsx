@@ -5,6 +5,7 @@ import { Colors } from '../theme/colors';
 import { Radius } from '../theme/radius';
 import { Shadows } from '../theme/shadow';
 import { Spacing } from '../theme/spacing';
+import { LeaderPlayer } from '../types';
 
 interface LeaderboardCardProps {
   item: LeaderPlayer;
@@ -37,10 +38,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ item, index }) => {
         </View>
       </View>
 
-      {/* Team Info */}
       <View style={styles.teamInfo}>
-        <Subheading style={styles.teamName}>{item.teamName}</Subheading>
-        <Caption style={styles.teamLabel}>{item.teamLabel}</Caption>
+        <Subheading style={styles.teamName}>{item.name}</Subheading>
+        <Caption style={styles.teamLabel}>{item.label}</Caption>
       </View>
 
       {/* Stats */}

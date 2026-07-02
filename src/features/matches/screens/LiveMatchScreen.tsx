@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -20,7 +20,8 @@ import { Heading, Label } from '../../../components/Typography';
 
 import LiveScoreboard from '../components/LiveScoreboard';
 import PlayerScoreRow from '../components/PlayerScoreRow';
-import { MOCK_MATCHES, MOCK_LIVE_STATS } from '../constants/mockData';
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.LIVE_MATCH
@@ -32,8 +33,51 @@ const LiveMatchScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
   const { matchId } = route.params;
 
-  const match = MOCK_MATCHES.find(m => m.id === matchId) || MOCK_MATCHES[1];
-  const stats = MOCK_LIVE_STATS;
+  const [loading, setLoading] = useState(true);
+  const [match, setMatch] = useState<any>(null);
+  const [stats, setStats] = useState<any>({
+    mapName: 'Ascent',
+    elapsedTime: '15:23',
+    spectatorCount: 4200,
+    playersA: [],
+    playersB: [],
+  });
+
+  useEffect(() => {
+    const fetchMatch = async () => {
+      try {
+        const data = await matchService.getMatchById(matchId);
+        setMatch(data);
+        if (data?.liveStats) {
+          setStats(data.liveStats);
+        }
+      } catch (error) {
+        console.error('Failed to load live match', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMatch();
+  }, [matchId]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Icon name="chevron-down" size={28} color={Colors.text.primary} />
+          </TouchableOpacity>
+          <Heading style={styles.headerTitle}>Live Match</Heading>
+          <View style={{ width: 28 }} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!match) return null;
 
   return (
     <SafeAreaView style={styles.root}>
@@ -74,7 +118,7 @@ const LiveMatchScreen: React.FC = () => {
             </View>
           </View>
           <View style={styles.tableBody}>
-            {stats.playersA.map(player => (
+            {stats.playersA.map((player: any) => (
               <PlayerScoreRow key={player.id} player={player} />
             ))}
           </View>
@@ -90,7 +134,7 @@ const LiveMatchScreen: React.FC = () => {
             </View>
           </View>
           <View style={styles.tableBody}>
-            {stats.playersB.map(player => (
+            {stats.playersB.map((player: any) => (
               <PlayerScoreRow key={player.id} player={player} />
             ))}
           </View>

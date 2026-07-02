@@ -10,7 +10,7 @@ export interface Tournament {
   slotsUsed: number;
   date: string;
   time: string;
-  status: 'live' | 'open' | 'upcoming' | 'completed';
+  status: 'live' | 'open' | 'upcoming' | 'completed' | 'ongoing' | 'published' | 'registration' | 'draft' | 'archived';
   organizer?: string;
   entryFee?: string; // e.g. "Free" or "100"
   prizePool?: string; // e.g. "10k" or "None"
@@ -22,11 +22,15 @@ export interface Tournament {
 export interface LeaderPlayer {
   id: string;
   rank: number;
-  teamName: string;
-  teamLabel: string;
+  name: string;
+  label: string;
   avatar: string;
   points: number;
   games: number;
+  xp?: number;
+  wins?: number;
+  country?: string;
+  countryCode?: string;
 }
 
 // Hero Banner Type

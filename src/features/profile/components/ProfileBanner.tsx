@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary.main,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: Radius.round,
+    borderRadius: Radius.full,
     borderWidth: 2,
     borderColor: Colors.dark.background,
   },

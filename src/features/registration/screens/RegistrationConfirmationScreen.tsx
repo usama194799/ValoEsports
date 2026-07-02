@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -24,11 +24,11 @@ import {
   TermsAndConditionsSheet,
   TournamentRulesSheet,
 } from '../components/BottomSheets';
-import {
-  REGISTRATION_TOURNAMENT_DETAILS,
-  MOCK_ELIGIBLE_TEAMS,
-  MOCK_INELIGIBLE_TEAMS,
-} from '../constants/mockData';
+import { tournamentService } from '../../../services/tournamentService';
+import { teamService } from '../../../services/teamService';
+import { registrationService } from '../../../services/registrationService';
+import { Tournament } from '../../../types';
+import { Team } from '../../team/types/team';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.REGISTRATION_CONFIRMATION
@@ -41,13 +41,30 @@ type ScreenRouteProp = RouteProp<
 const RegistrationConfirmationScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
-  const { teamId } = route.params;
+  const { tournamentId, teamId } = route.params;
 
-  const tournament = REGISTRATION_TOURNAMENT_DETAILS;
-  const team = useMemo(() => {
-    const allTeams = [...MOCK_ELIGIBLE_TEAMS, ...MOCK_INELIGIBLE_TEAMS];
-    return allTeams.find(t => t.id === teamId);
-  }, [teamId]);
+  const [tournament, setTournament] = useState<Tournament | null>(null);
+  const [team, setTeam] = useState<Team | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tournData, teamData] = await Promise.all([
+          tournamentService.getTournamentById(tournamentId),
+          teamService.getTeamById(teamId),
+        ]);
+        if (tournData) setTournament(tournData);
+        if (teamData) setTeam(teamData as any);
+      } catch (error) {
+        console.error('Failed to load data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [tournamentId, teamId]);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -57,14 +74,24 @@ const RegistrationConfirmationScreen: React.FC = () => {
     navigation.goBack();
   }, [navigation]);
 
-  const handleConfirm = useCallback(() => {
-    navigation.navigate(ROUTES.REGISTRATION_SUCCESS, {
-      tournamentId: tournament.id,
-      teamId,
-    });
-  }, [navigation, tournament.id, teamId]);
+  const handleConfirm = useCallback(async () => {
+    if (!tournament) return;
+    try {
+      setSubmitting(true);
+      await registrationService.registerForTournament(tournamentId, teamId);
+      navigation.navigate(ROUTES.REGISTRATION_SUCCESS, {
+        tournamentId: tournament.id,
+        teamId,
+      });
+    } catch (error) {
+      console.error('Failed to register', error);
+      // Fallback: alert the user or let a global interceptor handle it
+    } finally {
+      setSubmitting(false);
+    }
+  }, [navigation, tournament, tournamentId, teamId]);
 
-  if (!team) return null;
+  if (loading || !team || !tournament) return null;
 
   return (
     <SafeAreaView style={styles.root}>
@@ -139,13 +166,13 @@ const RegistrationConfirmationScreen: React.FC = () => {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.primaryBtn, !termsAccepted && styles.btnDisabled]}
+          style={[styles.primaryBtn, (!termsAccepted || submitting) && styles.btnDisabled]}
           activeOpacity={0.8}
           onPress={handleConfirm}
-          disabled={!termsAccepted}
+          disabled={!termsAccepted || submitting}
         >
           <Heading style={styles.btnText}>
-            Confirm & Pay {tournament.entryFee}
+            {submitting ? 'Processing...' : `Confirm & Pay ${tournament.entryFee || 'Free'}`}
           </Heading>
         </TouchableOpacity>
       </View>
@@ -153,12 +180,12 @@ const RegistrationConfirmationScreen: React.FC = () => {
       <TermsAndConditionsSheet
         visible={showTerms}
         onClose={() => setShowTerms(false)}
-        content={tournament.termsAndConditions}
+        content={(tournament as any).termsAndConditions || 'Terms and Conditions will be updated shortly.'}
       />
       <TournamentRulesSheet
         visible={showRules}
         onClose={() => setShowRules(false)}
-        content={tournament.fullRules}
+        content={(tournament as any).fullRules || 'Tournament rules will be updated shortly.'}
       />
     </SafeAreaView>
   );

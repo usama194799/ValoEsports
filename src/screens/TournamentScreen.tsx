@@ -5,6 +5,7 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,8 +14,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { ROUTES } from '../navigation/routes';
 import { Tournament } from '../types';
-import { playerService } from '../services'; // We will just use playerService or a mocked fetch for tournaments
-import { db } from '../data/db'; // Direct access for mock
+import { tournamentService } from '../services';
+
 import SearchHeader from '../components/SearchHeader';
 import CategoryChips from '../components/CategoryChips';
 import TournamentListCard from '../components/TournamentListCard';
@@ -35,6 +36,7 @@ const CATEGORIES = [
   'Free Fire',
   'CS2',
 ];
+
 const SORT_OPTIONS = [
   'Newest',
   'Popular',
@@ -52,7 +54,11 @@ const TournamentScreen: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [page, setPage] = useState(1);
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('Newest');
 
@@ -60,42 +66,54 @@ const TournamentScreen: React.FC = () => {
   const [networkError, setNetworkError] = useState(false);
 
   const fetchTournaments = useCallback(
-    async (isRefresh = false) => {
+    async (isRefresh = false, isLoadMore = false) => {
       try {
-        if (!isRefresh) setLoading(true);
+        if (!isRefresh && !isLoadMore) setLoading(true);
+        if (isLoadMore) setLoadingMore(true);
         setNetworkError(false);
 
-        // Simulate API call
-        await new Promise<void>(resolve => setTimeout(resolve, 1000));
-
-        let data = [...db.tournaments];
-
-        // Category Filter
+        const targetPage = isLoadMore ? page + 1 : 1;
+        const params: any = { page: targetPage, sort };
         if (category !== 'All') {
-          data = data.filter(t =>
-            t.gameName.toLowerCase().includes(category.toLowerCase()),
-          );
+          params.category = category;
         }
 
-        setTournaments(data);
+        const response = await tournamentService.getTournaments(params);
+        
+        if (isLoadMore) {
+          setTournaments(prev => [...prev, ...response]);
+        } else {
+          setTournaments(response);
+        }
+
+        setPage(targetPage);
+        setHasMore(response.length >= 15); // Assuming 15 per page is backend default
+
       } catch (e) {
         setNetworkError(true);
       } finally {
         setLoading(false);
         setRefreshing(false);
+        setLoadingMore(false);
       }
     },
-    [category],
+    [category, page, sort],
   );
 
   useEffect(() => {
     fetchTournaments();
-  }, [fetchTournaments]);
+  }, [category, sort]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchTournaments(true);
   }, [fetchTournaments]);
+
+  const onLoadMore = useCallback(() => {
+    if (!loadingMore && hasMore && !loading && !refreshing) {
+      fetchTournaments(false, true);
+    }
+  }, [loadingMore, hasMore, loading, refreshing, fetchTournaments]);
 
   const handleSearchPress = useCallback(() => {
     navigation.navigate(ROUTES.SEARCH);
@@ -129,6 +147,15 @@ const TournamentScreen: React.FC = () => {
       />
     );
   }, [loading, networkError, fetchTournaments]);
+
+  const renderFooter = useCallback(() => {
+    if (!loadingMore) return null;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator color={Colors.primary.main} />
+      </View>
+    );
+  }, [loadingMore]);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -179,6 +206,9 @@ const TournamentScreen: React.FC = () => {
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmpty}
+            ListFooterComponent={renderFooter}
+            onEndReached={onLoadMore}
+            onEndReachedThreshold={0.5}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -250,6 +280,10 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: 100, // accommodate bottom tab
+  },
+  footerLoader: {
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
   },
 });
 

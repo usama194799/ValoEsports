@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { FlashList, ListRenderItem } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
   useSharedValue,
@@ -33,24 +33,37 @@ type MyTeamsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const MyTeamsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<MyTeamsNavigationProp>();
-  const { teams } = useTeamData();
+  const { getMyTeams } = useTeamData();
+  
+  const [teams, setTeams] = useState<Team[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fabScale = useSharedValue(1);
 
-  // Simulate network load on mount
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
+  const fetchTeams = useCallback(async (isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      const data = await getMyTeams();
+      setTeams(data);
+    } catch (e) {
+      console.error('Failed to load teams', e);
+    } finally {
       setLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+      if (isRefresh) setRefreshing(false);
+    }
+  }, [getMyTeams]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchTeams();
+    }, [fetchTeams])
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
-  }, []);
+    fetchTeams(true);
+  }, [fetchTeams]);
 
   const handleCreateTeam = useCallback(() => {
     navigation.navigate(ROUTES.CREATE_TEAM);
@@ -99,20 +112,29 @@ const MyTeamsScreen = () => {
 
   return (
     <View style={styles.root}>
+      {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top || Spacing.md }]}>
         <Heading style={styles.headerTitle}>My Teams</Heading>
+        <TouchableOpacity
+          style={styles.searchBtn}
+          onPress={() => navigation.navigate(ROUTES.JOIN_TEAM)}
+        >
+          <Icon name="magnify" size={24} color={Colors.text.primary} />
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.listContainer}>
-        {loading ? (
+      {/* Content */}
+      <View style={styles.content}>
+        {loading && !refreshing ? (
           renderSkeletons()
         ) : (
           <FlashList
             data={teams}
-            renderItem={renderItem}
             keyExtractor={item => item.id}
-            estimatedItemSize={250}
+            renderItem={renderItem}
+            estimatedItemSize={120}
             contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmpty}
             refreshControl={
               <RefreshControl
@@ -126,9 +148,16 @@ const MyTeamsScreen = () => {
         )}
       </View>
 
-      <Animated.View style={[styles.fabWrapper, fabStyle, Shadows.fab]}>
+      {/* Floating Action Button */}
+      <Animated.View
+        style={[
+          styles.fabContainer,
+          { bottom: insets.bottom + 90 }, // space for bottom tab + padding
+          fabStyle,
+        ]}
+      >
         <TouchableOpacity
-          style={styles.fab}
+          style={[styles.fab, Shadows.card]}
           activeOpacity={0.8}
           onPress={handleCreateTeam}
         >
@@ -145,40 +174,49 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background,
   },
   header: {
-    paddingHorizontal: Spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
     backgroundColor: Colors.dark.surface,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.neutral.border,
   },
   headerTitle: {
     fontSize: 24,
   },
-  listContainer: {
+  searchBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.dark.surfaceLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
     flex: 1,
   },
   listContent: {
     padding: Spacing.lg,
-    paddingBottom: 100, // Space for FAB
+    paddingBottom: 100, // accommodate bottom tab & FAB
   },
   skeletonContainer: {
     padding: Spacing.lg,
+    gap: Spacing.md,
   },
-  fabWrapper: {
+  fabContainer: {
     position: 'absolute',
-    bottom: Spacing.xxl,
-    right: Spacing.xl,
+    right: Spacing.lg,
+  },
+  fab: {
     width: 56,
     height: 56,
     borderRadius: 28,
     backgroundColor: Colors.primary.main,
-  },
-  fab: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
-export default React.memo(MyTeamsScreen);
+export default MyTeamsScreen;

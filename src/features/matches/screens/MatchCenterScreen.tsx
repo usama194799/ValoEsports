@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -16,8 +16,9 @@ import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { Heading, Label } from '../../../components/Typography';
 
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 import MatchCard, { MatchData } from '../components/MatchCard';
-import { MOCK_MATCHES } from '../constants/mockData';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.MATCH_CENTER
@@ -30,9 +31,29 @@ const MatchCenterScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [activeTab, setActiveTab] = useState<TabType>('Upcoming');
 
-  const upcomingMatches = MOCK_MATCHES.filter(m => m.status === 'upcoming');
-  const liveMatches = MOCK_MATCHES.filter(m => m.status === 'live');
-  const completedMatches = MOCK_MATCHES.filter(m => m.status === 'completed');
+  const [loading, setLoading] = useState(true);
+  const [upcomingMatches, setUpcomingMatches] = useState<any[]>([]);
+  const [liveMatches, setLiveMatches] = useState<any[]>([]);
+  const [completedMatches, setCompletedMatches] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAllMatches = async () => {
+      try {
+        setLoading(true);
+        // We can either fetch all matches and filter, or make 3 requests. 
+        // Let's assume one endpoint can return all if we don't pass status, or we do it this way:
+        const allMatches = await matchService.getMatches();
+        setUpcomingMatches(allMatches.filter(m => m.status === 'upcoming'));
+        setLiveMatches(allMatches.filter(m => m.status === 'live'));
+        setCompletedMatches(allMatches.filter(m => m.status === 'completed'));
+      } catch (error) {
+        console.error('Failed to load matches', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllMatches();
+  }, []);
 
   const getActiveData = () => {
     switch (activeTab) {
@@ -143,17 +164,26 @@ const MatchCenterScreen: React.FC = () => {
     </View>
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Icon
-        name="gamepad-variant-outline"
-        size={64}
-        color={Colors.text.muted}
-      />
-      <Heading style={styles.emptyTitle}>No {activeTab} Matches</Heading>
-      <Label style={styles.emptySubtitle}>Check back later for updates.</Label>
-    </View>
-  );
+  const renderEmptyState = () => {
+    if (loading) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      );
+    }
+    return (
+      <View style={styles.emptyContainer}>
+        <Icon
+          name="gamepad-variant-outline"
+          size={64}
+          color={Colors.text.muted}
+        />
+        <Heading style={styles.emptyTitle}>No {activeTab} Matches</Heading>
+        <Label style={styles.emptySubtitle}>Check back later for updates.</Label>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.root}>

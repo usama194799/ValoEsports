@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import Animated, { SharedValue, useAnimatedStyle, interpolate, Extrapolation } from 'react-native-reanimated';
+import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../../../theme/colors';
 import { Spacing } from '../../../theme/spacing';
@@ -43,16 +44,22 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   onMarkRead,
 }) => {
   const iconColor = getCategoryColor(notification.category);
-  const swipeableRef = useRef<Swipeable>(null);
+  const swipeableRef = useRef<SwipeableMethods>(null);
 
   const renderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>,
+    progress: SharedValue<number>,
+    dragX: SharedValue<number>,
   ) => {
-    const scale = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [1, 0.5],
-      extrapolate: 'clamp',
+    const animatedStyle = useAnimatedStyle(() => {
+      const scale = interpolate(
+        dragX.value,
+        [-100, 0],
+        [1, 0.5],
+        Extrapolation.CLAMP
+      );
+      return {
+        transform: [{ scale }]
+      };
     });
 
     return (
@@ -68,7 +75,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               onMarkRead?.();
             }}
           >
-            <Animated.View style={{ transform: [{ scale }] }}>
+            <Animated.View style={animatedStyle}>
               <Icon name="check" size={24} color={Colors.dark.background} />
             </Animated.View>
           </TouchableOpacity>
@@ -80,7 +87,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
             onDelete?.();
           }}
         >
-          <Animated.View style={{ transform: [{ scale }] }}>
+          <Animated.View style={animatedStyle}>
             <Icon name="delete" size={24} color={Colors.dark.background} />
           </Animated.View>
         </TouchableOpacity>

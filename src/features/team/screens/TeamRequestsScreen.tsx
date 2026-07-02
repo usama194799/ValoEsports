@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import React, { useCallback, useState, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,56 +11,68 @@ import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import MemberAvatar from '../components/MemberAvatar';
 import EmptyState from '../../../components/EmptyState';
-
-// Dummy requests data
-const DUMMY_REQUESTS = [
-  {
-    id: 'req1',
-    user: {
-      name: 'shroud',
-      avatarUrl:
-        'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=100&h=100',
-      level: 88,
-    },
-    message: 'I would like to join your team!',
-  },
-  {
-    id: 'req2',
-    user: {
-      name: 'Tarik',
-      avatarUrl:
-        'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=100&h=100',
-      level: 95,
-    },
-    message: 'Looking for a competitive squad.',
-  },
-];
+import { useTeamData } from '../hooks/useTeamData';
+import { teamService } from '../../../services/teamService';
 
 const TeamRequestsScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const route = useRoute<any>();
+  const { getTeamRequests } = useTeamData();
 
-  const handleAccept = (id: string) => {
-    // accept logic
+  const teamId = route.params?.teamId;
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getTeamRequests(teamId);
+      setRequests(data);
+    } catch (e) {
+      console.error('Failed to load requests', e);
+    } finally {
+      setLoading(false);
+    }
+  }, [teamId, getTeamRequests]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  const handleAccept = async (id: string) => {
+    try {
+      await teamService.approveRequest(id);
+      Alert.alert('Success', 'Request approved.');
+      fetchRequests();
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.message || 'Failed to approve request.');
+    }
   };
 
-  const handleDecline = (id: string) => {
-    // decline logic
+  const handleDecline = async (id: string) => {
+    try {
+      await teamService.rejectRequest(id);
+      Alert.alert('Success', 'Request rejected.');
+      fetchRequests();
+    } catch (e: any) {
+      Alert.alert('Error', e?.response?.data?.message || 'Failed to reject request.');
+    }
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: (typeof DUMMY_REQUESTS)[0] }) => (
+    ({ item }: { item: any }) => (
       <View style={styles.requestCard}>
         <View style={styles.requestHeader}>
-          <MemberAvatar url={item.user.avatarUrl} size={40} />
+          <MemberAvatar url={item.user?.avatarUrl || 'https://via.placeholder.com/150'} size={40} />
           <View style={styles.requestInfo}>
-            <Subheading style={styles.playerName}>{item.user.name}</Subheading>
-            <Label style={styles.playerLevel}>Level {item.user.level}</Label>
+            <Subheading style={styles.playerName}>{item.user?.username || item.user?.name || 'Player'}</Subheading>
+            <Label style={styles.playerLevel}>Level {item.user?.level || 1}</Label>
           </View>
         </View>
 
         <View style={styles.messageBox}>
-          <Label style={styles.messageText}>"{item.message}"</Label>
+          <Label style={styles.messageText}>"{item.message || 'I would like to join your team!'}"</Label>
         </View>
 
         <View style={styles.actionsRow}>
@@ -96,20 +108,22 @@ const TeamRequestsScreen = () => {
       </View>
 
       <View style={styles.listContainer}>
-        <FlashList
-          data={DUMMY_REQUESTS}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          estimatedItemSize={160}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <EmptyState
-              icon="inbox-outline"
-              title="No Pending Requests"
-              message="When players request to join your team, they will appear here."
-            />
-          }
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary.main} style={{ marginTop: Spacing.xxl }} />
+        ) : requests.length > 0 ? (
+          <FlashList
+            data={requests}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            estimatedItemSize={150}
+            contentContainerStyle={styles.listContent}
+          />
+        ) : (
+          <EmptyState
+            title="No Requests"
+            message="There are no pending join requests."
+          />
+        )}
       </View>
     </View>
   );
@@ -123,19 +137,18 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
-    backgroundColor: Colors.dark.surface,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.neutral.border,
+    backgroundColor: Colors.dark.surface,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+    padding: Spacing.xs,
+    marginRight: Spacing.sm,
   },
   headerTitle: {
+    flex: 1,
     fontSize: 18,
   },
   listContainer: {
@@ -143,14 +156,15 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
   },
   requestCard: {
-    backgroundColor: Colors.dark.cardAlt,
+    backgroundColor: Colors.dark.surface,
     borderRadius: Radius.lg,
-    padding: Spacing.lg,
+    padding: Spacing.md,
     marginBottom: Spacing.md,
-    borderWidth: 0.5,
-    borderColor: Colors.neutral.borderLight,
+    borderWidth: 1,
+    borderColor: Colors.neutral.border,
   },
   requestHeader: {
     flexDirection: 'row',
@@ -162,17 +176,17 @@ const styles = StyleSheet.create({
   },
   playerName: {
     fontSize: 16,
-    marginBottom: 2,
+    color: Colors.text.primary,
   },
   playerLevel: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.text.muted,
   },
   messageBox: {
-    backgroundColor: Colors.dark.surface,
+    backgroundColor: Colors.dark.surfaceLight,
     padding: Spacing.md,
     borderRadius: Radius.md,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   messageText: {
     color: Colors.text.secondary,
@@ -184,19 +198,19 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    height: 40,
+    paddingVertical: Spacing.sm,
     borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
   declineBtn: {
-    backgroundColor: Colors.dark.surface,
-    borderColor: Colors.neutral.borderLight,
+    backgroundColor: 'transparent',
+    borderColor: '#FF4B4B',
   },
   declineText: {
-    color: Colors.text.secondary,
-    fontWeight: '600',
+    color: '#FF4B4B',
+    fontWeight: 'bold',
   },
   acceptBtn: {
     backgroundColor: Colors.primary.glow,
@@ -204,7 +218,7 @@ const styles = StyleSheet.create({
   },
   acceptText: {
     color: Colors.primary.main,
-    fontWeight: '700',
+    fontWeight: 'bold',
   },
 });
 

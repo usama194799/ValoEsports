@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   menuIconWrapper: {
     width: 40,
     height: 40,
-    borderRadius: Radius.round,
+    borderRadius: Radius.full,
     backgroundColor: Colors.primary.glow,
     alignItems: 'center',
     justifyContent: 'center',

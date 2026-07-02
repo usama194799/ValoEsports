@@ -4,12 +4,14 @@ import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../../../navigation/types';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { RootStackParamList, RootStackScreenProps } from '../../../navigation/types';
+import { ROUTES } from '../../../navigation/routes';
 import { DetailedTournament } from '../types';
-import { MOCK_TOURNAMENT_DETAILS } from '../constants';
 import { Colors } from '../../../theme/colors';
 import { wp } from '../../../utils/responsive';
+import { Images } from '../../../theme/images';
+import { tournamentService } from '../../../services';
 
 import HeroBanner from '../components/HeroBanner';
 import InfoCard from '../components/InfoCard';
@@ -31,6 +33,7 @@ type TournamentDetailsRouteProp = RouteProp<
 
 const TournamentDetailsScreen: React.FC = () => {
   const route = useRoute<TournamentDetailsRouteProp>();
+  const navigation = useNavigation<any>();
   const tournamentId = route.params?.tournamentId;
 
   const [loading, setLoading] = useState(true);
@@ -47,17 +50,68 @@ const TournamentDetailsScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    // Simulate API fetch using the ID
     const fetchDetails = async () => {
-      setLoading(true);
-      await new Promise<void>(resolve => setTimeout(resolve, 800));
-      // Always use mock data since this is a UI implementation without real backend
-      setTournament(MOCK_TOURNAMENT_DETAILS);
-      setIsFavorite(MOCK_TOURNAMENT_DETAILS.isFavorite);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const data = await tournamentService.getTournamentById(tournamentId) as any;
+        
+        if (data) {
+          // Map backend Tournament to DetailedTournament gracefully
+          const mapped: DetailedTournament = {
+            ...data,
+            banner: data.image || Images.hero.bg1,
+            teamSize: data.teamSize || '5v5',
+            format: data.format || 'Double Elimination',
+            entryFee: data.entryFee || 'Free',
+            prizePool: data.prizePool || '$0',
+            registrationDeadline: data.registrationDeadline || data.date,
+            serverRegion: data.serverRegion || 'Global',
+            platform: data.platform || 'Cross-platform',
+            slotsUsed: data.slotsUsed || 0,
+            description: data.description || 'No description provided.',
+            isFavorite: false,
+            
+            // Map nested properties safely with fallbacks
+            organizer: data.organizer || {
+              id: 'org-0',
+              name: 'Platform Admin',
+              logo: Images.avatars.player1,
+              isVerified: true,
+              followers: 0,
+              completedTournaments: 0,
+              rating: 5.0,
+            },
+            stats: data.stats || {
+              totalTeams: data.slots || 0,
+              registeredPlayers: data.slotsUsed || 0,
+              completedMatches: 0,
+              remainingMatches: 0,
+              spectators: 0,
+              views: 0,
+              likes: 0,
+            },
+            prizes: data.prizes || [],
+            rules: data.rules || [
+              {
+                id: 'r1',
+                title: 'General Rules',
+                content: 'Respect all players and admins. Fair play is required.',
+              }
+            ],
+            teams: data.teams || [],
+            schedule: data.schedule || [],
+          };
+          setTournament(mapped);
+          setIsFavorite(false);
+        }
+      } catch (e) {
+        console.error('Failed to load tournament details', e);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchDetails();
+    if (tournamentId) fetchDetails();
   }, [tournamentId]);
 
   const handleFavoriteToggle = useCallback(() => {
@@ -74,8 +128,10 @@ const TournamentDetailsScreen: React.FC = () => {
 
   const handleConfirmRegistration = useCallback(() => {
     setSheetVisible(false);
-    console.log('Registration Confirmed');
-  }, []);
+    navigation.navigate(ROUTES.REGISTRATION_OVERVIEW as any, {
+      tournamentId,
+    });
+  }, [navigation, tournamentId]);
 
   if (loading || !tournament) {
     return <SkeletonDetails />;
@@ -98,18 +154,18 @@ const TournamentDetailsScreen: React.FC = () => {
           <DescriptionSection description={tournament.description} />
           <PrizeDistribution prizes={tournament.prizes} />
           <RulesSection rules={tournament.rules} />
-          <ParticipatingTeams teams={tournament.teams} />
-          <MatchSchedule schedule={tournament.schedule} />
           <TournamentStats stats={tournament.stats} />
           <OrganizerCard organizer={tournament.organizer} />
+          <ParticipatingTeams teams={tournament.teams} />
+          <MatchSchedule schedule={tournament.schedule} />
         </View>
+
       </Animated.ScrollView>
 
-      {/* Absolutely positioned overlay components */}
       <HeroBanner
         banner={tournament.banner}
         name={tournament.name}
-        organizerName={tournament.organizer.name}
+        organizerName={tournament.organizer?.name || 'Platform Admin'}
         status={tournament.status}
         scrollY={scrollY}
         isFavorite={isFavorite}
@@ -124,15 +180,13 @@ const TournamentDetailsScreen: React.FC = () => {
 
       <RegistrationBottomSheet
         visible={sheetVisible}
-        tournament={tournament}
         onClose={() => setSheetVisible(false)}
         onConfirm={handleConfirmRegistration}
+        tournament={tournament}
       />
     </View>
   );
 };
-
-const HEADER_MAX_HEIGHT = wp(280);
 
 const styles = StyleSheet.create({
   root: {
@@ -140,18 +194,20 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background,
   },
   scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 100, // accommodate sticky panel
+    paddingBottom: 120, // space for sticky footer
   },
   heroPlaceholder: {
-    height: HEADER_MAX_HEIGHT,
-    width: '100%',
+    height: wp(300),
   },
   contentContainer: {
     backgroundColor: Colors.dark.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    minHeight: 1000,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    marginTop: -32,
+    paddingTop: 32,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    gap: 32,
   },
 });
 

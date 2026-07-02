@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,7 +17,8 @@ import { Radius } from '../../../theme/radius';
 import { Heading, Label } from '../../../components/Typography';
 
 import MatchCard, { MatchData } from '../components/MatchCard';
-import { MOCK_HISTORY } from '../constants/mockData';
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.MATCHES_HISTORY_GLOBAL
@@ -26,12 +27,28 @@ type NavigationProp = RootStackScreenProps<
 const MatchesHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [historyMatches, setHistoryMatches] = useState<any[]>([]);
 
-  const filteredMatches = MOCK_HISTORY.filter(
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const data = await matchService.getMatches({ status: 'completed' });
+        setHistoryMatches(data);
+      } catch (error) {
+        console.error('Failed to load match history', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistory();
+  }, []);
+
+  const filteredMatches = historyMatches.filter(
     match =>
-      match.tournamentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      match.teamA.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      match.teamB.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      match.tournamentName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.teamA?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.teamB?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleMatchPress = useCallback(
@@ -75,15 +92,24 @@ const MatchesHistoryScreen: React.FC = () => {
     </View>
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Icon name="history" size={64} color={Colors.text.muted} />
-      <Heading style={styles.emptyTitle}>No Matches Found</Heading>
-      <Label style={styles.emptySubtitle}>
-        Try adjusting your search or filters.
-      </Label>
-    </View>
-  );
+  const renderEmptyState = () => {
+    if (loading) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      );
+    }
+    return (
+      <View style={styles.emptyContainer}>
+        <Icon name="history" size={64} color={Colors.text.muted} />
+        <Heading style={styles.emptyTitle}>No Matches Found</Heading>
+        <Label style={styles.emptySubtitle}>
+          Try adjusting your search or filters.
+        </Label>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.root}>

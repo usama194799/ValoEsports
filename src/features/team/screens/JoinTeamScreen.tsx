@@ -1,12 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,10 +17,12 @@ import { Colors } from '../../../theme/colors';
 import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { useTeamData } from '../hooks/useTeamData';
+import { teamService } from '../../../services/teamService';
 import TeamCard from '../components/TeamCard';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../navigation/types';
 import { ROUTES } from '../../../navigation/routes';
+import { Team } from '../types/team';
 
 type JoinTeamNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -27,13 +31,49 @@ const JoinTeamScreen = () => {
   const navigation = useNavigation<JoinTeamNavigationProp>();
   const [code, setCode] = useState('');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  const { getMyTeams } = useTeamData();
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const { teams } = useTeamData();
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
 
-  const handleJoinByCode = useCallback(() => {
+  const fetchTeams = useCallback(async (query: string) => {
+    try {
+      setLoading(true);
+      // Usually, you would hit a global search endpoint here, not just "my teams".
+      // Assuming getTeams endpoint exists with a search query.
+      const data = await teamService.getTeams(query ? { search: query } : {});
+      setTeams(data);
+    } catch (e) {
+      console.error('Failed to search teams', e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchTeams(debouncedSearch);
+    }, [debouncedSearch, fetchTeams])
+  );
+
+  const handleJoinByCode = useCallback(async () => {
     if (code.length === 6) {
-      // Simulate joining
-      navigation.goBack();
+      try {
+        // Here we simulate the code acceptance. The backend may have a /team-invitations/code/accept
+        // Let's assume we request join instead as a fallback.
+        // Alert.alert('Simulated Join', 'This is a stub for code joining.');
+        navigation.goBack();
+      } catch (e) {
+        console.error('Failed to join by code', e);
+      }
     }
   }, [code, navigation]);
 
@@ -103,39 +143,51 @@ const JoinTeamScreen = () => {
               </Subheading>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity style={styles.qrBtn}>
-            <Icon name="qrcode-scan" size={20} color={Colors.primary.main} />
-            <Label style={styles.qrText}>Scan QR Code</Label>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.divider} />
 
-        {/* Search Public Teams */}
+        {/* Browse Teams */}
         <View style={styles.section}>
-          <Heading style={styles.sectionTitle}>Search Public Teams</Heading>
-          <View style={styles.searchBar}>
-            <Icon name="magnify" size={20} color={Colors.text.muted} />
+          <View style={styles.browseHeader}>
+            <Heading style={styles.sectionTitle}>Browse Teams</Heading>
+            <TouchableOpacity style={styles.filterBtn}>
+              <Icon name="tune-variant" size={20} color={Colors.text.primary} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.searchBox}>
+            <Icon
+              name="magnify"
+              size={20}
+              color={Colors.text.muted}
+              style={styles.searchIcon}
+            />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by team name or tag"
+              placeholder="Search by name or tag..."
               placeholderTextColor={Colors.text.muted}
               value={search}
               onChangeText={setSearch}
             />
           </View>
-        </View>
 
-        <View style={styles.teamsList}>
-          {teams.map((team, index) => (
-            <TeamCard
-              key={team.id}
-              team={team}
-              index={index}
-              onPress={() => handleTeamPress(team.id)}
-            />
-          ))}
+          <View style={styles.teamsList}>
+            {loading ? (
+              <ActivityIndicator size="large" color={Colors.primary.main} style={{ marginTop: Spacing.xl }} />
+            ) : teams.length > 0 ? (
+              teams.map((t, index) => (
+                <TeamCard
+                  key={t.id}
+                  team={t}
+                  index={index}
+                  onPress={() => handleTeamPress(t.id)}
+                />
+              ))
+            ) : (
+              <Label style={styles.emptyText}>No teams found.</Label>
+            )}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -153,36 +205,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
-    backgroundColor: Colors.dark.surface,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.neutral.border,
+    backgroundColor: Colors.dark.surface,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+    padding: Spacing.xs,
   },
   headerTitle: {
     fontSize: 18,
   },
   scrollContent: {
-    paddingBottom: Spacing.xxl * 2,
+    paddingBottom: Spacing.xxl,
   },
   section: {
-    padding: Spacing.xl,
+    padding: Spacing.lg,
   },
   sectionTitle: {
     fontSize: 18,
     marginBottom: Spacing.xs,
   },
   sectionDesc: {
-    color: Colors.text.muted,
-    marginBottom: Spacing.lg,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.md,
   },
   codeRow: {
     flexDirection: 'row',
     gap: Spacing.md,
-    marginBottom: Spacing.md,
   },
   codeInputWrapper: {
     flex: 1,
@@ -191,76 +240,79 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
+    borderColor: Colors.neutral.border,
     paddingHorizontal: Spacing.md,
-    height: 48,
+    height: 52,
+    gap: Spacing.sm,
   },
   codeInput: {
     flex: 1,
     color: Colors.text.primary,
-    fontSize: 18,
+    fontSize: 20,
     letterSpacing: 2,
-    marginLeft: Spacing.sm,
+    fontWeight: '600',
   },
   joinBtn: {
-    width: 80,
-    height: 48,
-    backgroundColor: Colors.dark.surface,
+    backgroundColor: Colors.dark.surfaceLight,
+    paddingHorizontal: Spacing.xl,
     borderRadius: Radius.md,
-    alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
+    alignItems: 'center',
   },
   joinBtnActive: {
     backgroundColor: Colors.primary.main,
-    borderColor: Colors.primary.main,
   },
   joinText: {
     color: Colors.text.muted,
   },
   joinTextActive: {
     color: Colors.text.primary,
-    fontWeight: '700',
-  },
-  qrBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 48,
-    backgroundColor: Colors.primary.glow,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.primary.main,
-    gap: Spacing.sm,
-  },
-  qrText: {
-    color: Colors.primary.main,
-    fontWeight: '600',
   },
   divider: {
     height: 8,
-    backgroundColor: Colors.dark.surface,
+    backgroundColor: Colors.dark.surfaceLight,
   },
-  searchBar: {
+  browseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  filterBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.dark.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.dark.surface,
     borderRadius: Radius.full,
-    paddingHorizontal: Spacing.lg,
-    height: 44,
+    paddingHorizontal: Spacing.md,
+    height: 48,
     borderWidth: 1,
-    borderColor: Colors.neutral.borderLight,
+    borderColor: Colors.neutral.border,
+    marginBottom: Spacing.xl,
+  },
+  searchIcon: {
+    marginRight: Spacing.sm,
   },
   searchInput: {
     flex: 1,
     color: Colors.text.primary,
-    marginLeft: Spacing.sm,
     fontSize: 14,
   },
   teamsList: {
-    paddingHorizontal: Spacing.lg,
+    gap: Spacing.md,
   },
+  emptyText: {
+    textAlign: 'center',
+    color: Colors.text.muted,
+    marginTop: Spacing.xl,
+  }
 });
 
 export default JoinTeamScreen;

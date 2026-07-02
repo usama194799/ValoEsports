@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -23,7 +23,8 @@ import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { Heading, Label, Subheading } from '../../../components/Typography';
 
-import { MOCK_RESULT, MOCK_MATCHES } from '../constants/mockData';
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.MATCH_RESULT
@@ -38,8 +39,61 @@ const MatchResultScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
   const { matchId } = route.params;
 
-  const match = MOCK_MATCHES.find(m => m.id === matchId) || MOCK_MATCHES[2];
-  const result = MOCK_RESULT;
+  const [loading, setLoading] = useState(true);
+  const [match, setMatch] = useState<any>(null);
+  const [result, setResult] = useState<any>({
+    winner: { name: 'Winner', logoUrl: '' },
+    finalScore: '0 - 0',
+    prizeEarned: '$0',
+    xpEarned: '0 XP',
+    mvp: { name: 'Unknown', avatar: '', kills: 0 },
+  });
+
+  useEffect(() => {
+    const fetchMatch = async () => {
+      try {
+        const data = await matchService.getMatchById(matchId);
+        setMatch(data);
+        if (data?.result) {
+          setResult(data.result);
+        } else if (data) {
+          // fallback if result not structured that way
+          const winner = data.scoreA > data.scoreB ? data.teamA : data.teamB;
+          setResult({
+            winner: winner,
+            finalScore: `${data.scoreA} - ${data.scoreB}`,
+            prizeEarned: '$0',
+            xpEarned: '0 XP',
+            mvp: { name: 'Unknown', avatar: '', kills: 0 },
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load match result', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMatch();
+  }, [matchId]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Icon name="close" size={24} color={Colors.text.primary} />
+          </TouchableOpacity>
+          <Heading style={styles.headerTitle}>Match Result</Heading>
+          <View style={{ width: 28 }} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!match) return null;
 
   const handleReturnHome = () => {
     navigation.dispatch(

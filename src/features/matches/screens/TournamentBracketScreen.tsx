@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,28 +6,51 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { RootStackScreenProps } from '../../../navigation/types';
+import { RootStackScreenProps, RootStackParamList } from '../../../navigation/types';
 import { ROUTES } from '../../../navigation/routes';
 import { Colors } from '../../../theme/colors';
 import { Spacing } from '../../../theme/spacing';
 import { Heading } from '../../../components/Typography';
 
 import BracketNode, { BracketMatch } from '../components/BracketNode';
-import { MOCK_BRACKET } from '../constants/mockData';
+import { matchService } from '../../../services/matchService';
+import { ActivityIndicator } from 'react-native';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.TOURNAMENT_BRACKET
 >['navigation'];
 
+type ScreenRouteProp = RouteProp<
+  RootStackParamList,
+  typeof ROUTES.TOURNAMENT_BRACKET
+>;
+
 const TournamentBracketScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<ScreenRouteProp>();
+  const { tournamentId } = route.params || { tournamentId: 'tourney_1' };
 
-  // In a real app, you would parse the bracket into rounds/columns.
-  // We'll hardcode the structure based on MOCK_BRACKET for this prototype.
-  const semiFinals = MOCK_BRACKET.filter(m => m.round === 'Semi-Final');
-  const finals = MOCK_BRACKET.filter(m => m.round === 'Grand Final');
+  const [loading, setLoading] = useState(true);
+  const [brackets, setBrackets] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchBrackets = async () => {
+      try {
+        const data = await matchService.getTournamentBrackets(tournamentId);
+        setBrackets(data);
+      } catch (error) {
+        console.error('Failed to load brackets', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrackets();
+  }, [tournamentId]);
+
+  const semiFinals = brackets.filter(m => m.round === 'Semi-Final');
+  const finals = brackets.filter(m => m.round === 'Grand Final');
 
   const handleNodePress = useCallback(
     (match: BracketMatch) => {

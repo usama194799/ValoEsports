@@ -1,6 +1,9 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import { AuthContextType, AuthState, User } from '../types/auth';
+import { authService } from '../services/authService';
+import { setUnauthorizedCallback } from '../../../api/client';
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -17,7 +20,6 @@ export const AuthContext = createContext<AuthContextType>({
 });
 
 const STORAGE_KEYS = {
-  TOKEN: '@mux_auth_token',
   USER: '@mux_auth_user',
   ONBOARDING: '@mux_has_seen_onboarding',
 };
@@ -27,30 +29,58 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [state, setState] = useState<AuthState>(initialState);
 
+  const logout = async () => {
+    try {
+      await Promise.all([
+        Keychain.resetGenericPassword(),
+        AsyncStorage.removeItem(STORAGE_KEYS.USER),
+      ]);
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+      }));
+    } catch (e) {
+      console.error('Failed to clear auth state', e);
+    }
+  };
+
   useEffect(() => {
-    // Check initial state from AsyncStorage
+    // Setup global 401 callback
+    setUnauthorizedCallback(() => {
+      logout();
+    });
+
     const checkAuthStatus = async () => {
       try {
-        const [token, userStr, onboardingStr] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEYS.TOKEN),
-          AsyncStorage.getItem(STORAGE_KEYS.USER),
-          AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING),
-        ]);
-
+        const onboardingStr = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING);
         const hasSeenOnboarding = onboardingStr === 'true';
-        let user = null;
-        if (userStr) {
-          try {
-            user = JSON.parse(userStr);
-          } catch (e) {}
-        }
 
-        setState({
-          isAuthenticated: !!token && !!user,
-          user: user,
-          hasSeenOnboarding,
-          isLoading: false,
-        });
+        const credentials = await Keychain.getGenericPassword();
+        if (credentials && credentials.password) {
+          try {
+            const user = await authService.getCurrentUser();
+            await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+            setState({
+              isAuthenticated: true,
+              user,
+              hasSeenOnboarding,
+              isLoading: false,
+            });
+          } catch (e) {
+            // Auto logout if getCurrentUser fails (e.g. 401)
+            await logout();
+            setState(prev => ({ ...prev, hasSeenOnboarding, isLoading: false }));
+          }
+        } else {
+          // No token found
+          setState({
+            isAuthenticated: false,
+            user: null,
+            hasSeenOnboarding,
+            isLoading: false,
+          });
+        }
       } catch (error) {
         console.error('Failed to load auth state', error);
         setState(prev => ({ ...prev, isLoading: false }));
@@ -62,10 +92,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = async (token: string, user: User) => {
     try {
-      await Promise.all([
-        AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token),
-        AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user)),
-      ]);
+      await Keychain.setGenericPassword('token', token);
+      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       setState(prev => ({
         ...prev,
         isAuthenticated: true,
@@ -73,22 +101,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }));
     } catch (e) {
       console.error('Failed to save auth state', e);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await Promise.all([
-        AsyncStorage.removeItem(STORAGE_KEYS.TOKEN),
-        AsyncStorage.removeItem(STORAGE_KEYS.USER),
-      ]);
-      setState(prev => ({
-        ...prev,
-        isAuthenticated: false,
-        user: null,
-      }));
-    } catch (e) {
-      console.error('Failed to clear auth state', e);
     }
   };
 

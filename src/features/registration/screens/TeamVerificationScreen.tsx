@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -20,10 +20,8 @@ import { Heading, Label } from '../../../components/Typography';
 
 import ProgressStepper from '../components/ProgressStepper';
 import RequirementItem from '../components/RequirementItem';
-import {
-  MOCK_ELIGIBLE_TEAMS,
-  MOCK_INELIGIBLE_TEAMS,
-} from '../constants/mockData';
+import { teamService } from '../../../services/teamService';
+import { Team } from '../../team/types/team';
 
 type NavigationProp = RootStackScreenProps<
   typeof ROUTES.TEAM_VERIFICATION
@@ -38,9 +36,21 @@ const TeamVerificationScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
   const { tournamentId, teamId } = route.params;
 
-  const team = useMemo(() => {
-    const allTeams = [...MOCK_ELIGIBLE_TEAMS, ...MOCK_INELIGIBLE_TEAMS];
-    return allTeams.find(t => t.id === teamId);
+  const [team, setTeam] = useState<Team | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const data = await teamService.getTeamById(teamId);
+        if (data) setTeam(data as any);
+      } catch (error) {
+        console.error('Failed to fetch team', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeam();
   }, [teamId]);
 
   const handleBack = useCallback(() => {

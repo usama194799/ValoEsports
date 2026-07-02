@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import React, { useCallback, useState, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,6 +10,7 @@ import { Colors } from '../../../theme/colors';
 import { Spacing } from '../../../theme/spacing';
 import { Radius } from '../../../theme/radius';
 import { useTeamData } from '../hooks/useTeamData';
+import { teamService } from '../../../services/teamService';
 import MemberAvatar from '../components/MemberAvatar';
 
 const TeamMembersScreen = () => {
@@ -19,17 +20,53 @@ const TeamMembersScreen = () => {
   const { getTeamMembers } = useTeamData();
 
   const teamId = route.params?.teamId;
-  const members = getTeamMembers(teamId);
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchMembers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getTeamMembers(teamId);
+      setMembers(data);
+    } catch (e) {
+      console.error('Failed to fetch members', e);
+    } finally {
+      setLoading(false);
+    }
+  }, [teamId, getTeamMembers]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   const handleMemberAction = (member: any) => {
     Alert.alert(
       'Manage Member',
-      `What would you like to do with ${member.name}?`,
+      `What would you like to do with ${member.username || member.name || 'this member'}?`,
       [
-        { text: 'Promote to Co-Leader', onPress: () => console.log('Promote') },
+        {
+          text: 'Make Captain',
+          onPress: async () => {
+            try {
+              await teamService.transferCaptain(teamId, member.id);
+              Alert.alert('Success', 'Captain transferred successfully.');
+              fetchMembers();
+            } catch (e: any) {
+              Alert.alert('Error', e?.response?.data?.message || 'Failed to transfer captain.');
+            }
+          }
+        },
         {
           text: 'Kick from Team',
-          onPress: () => console.log('Kick'),
+          onPress: async () => {
+            try {
+              await teamService.removeMember(teamId, member.id);
+              Alert.alert('Success', 'Member removed.');
+              fetchMembers();
+            } catch (e: any) {
+              Alert.alert('Error', e?.response?.data?.message || 'Failed to remove member.');
+            }
+          },
           style: 'destructive',
         },
         { text: 'Cancel', style: 'cancel' },
@@ -39,35 +76,31 @@ const TeamMembersScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.memberRow}>
-        <MemberAvatar
-          url={item.avatarUrl}
-          size={48}
-          online={item.online}
-          role={item.role}
-        />
-        <View style={styles.memberInfo}>
-          <Subheading style={styles.memberName}>{item.name}</Subheading>
-          <Label style={styles.memberRole}>
-            {item.role === 'captain'
-              ? 'Captain'
-              : item.role === 'co-leader'
-              ? 'Co-Leader'
-              : 'Player'}
-            {' • '}
-            Level {item.level}
-          </Label>
+    ({ item }: { item: any }) => {
+      const isCaptain = item.role === 'captain' || item.isOwner;
+      return (
+        <View style={styles.memberRow}>
+          <MemberAvatar
+            url={item.avatarUrl || 'https://via.placeholder.com/150'}
+            size={48}
+            role={isCaptain ? 'captain' : 'player'}
+          />
+          <View style={styles.memberInfo}>
+            <Subheading style={styles.memberName}>{item.username || item.name || 'Player'}</Subheading>
+            <Label style={styles.memberRole}>
+              {isCaptain ? 'Captain' : 'Player'}
+            </Label>
+          </View>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => handleMemberAction(item)}
+          >
+            <Icon name="dots-horizontal" size={24} color={Colors.text.muted} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => handleMemberAction(item)}
-        >
-          <Icon name="dots-horizontal" size={24} color={Colors.text.muted} />
-        </TouchableOpacity>
-      </View>
-    ),
-    [],
+      );
+    },
+    [teamId, handleMemberAction],
   );
 
   return (
@@ -86,13 +119,17 @@ const TeamMembersScreen = () => {
       </View>
 
       <View style={styles.listContainer}>
-        <FlashList
-          data={members}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          estimatedItemSize={70}
-          contentContainerStyle={styles.listContent}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary.main} style={{ marginTop: Spacing.xxl }} />
+        ) : (
+          <FlashList
+            data={members}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            estimatedItemSize={70}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
       </View>
     </View>
   );
@@ -106,48 +143,46 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
-    backgroundColor: Colors.dark.surface,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.neutral.border,
+    backgroundColor: Colors.dark.surface,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+    padding: Spacing.xs,
+    marginRight: Spacing.sm,
   },
   headerTitle: {
-    fontSize: 18,
     flex: 1,
-    textAlign: 'center',
-    marginLeft: 16,
+    fontSize: 18,
   },
   headerCountBadge: {
-    backgroundColor: Colors.primary.glow,
+    backgroundColor: Colors.dark.surfaceLight,
     paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: Radius.full,
-    width: 40,
-    alignItems: 'center',
   },
   headerCount: {
-    color: Colors.primary.main,
-    fontWeight: '700',
+    color: Colors.text.primary,
+    fontWeight: 'bold',
   },
   listContainer: {
     flex: 1,
   },
   listContent: {
     padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
   },
   memberRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.neutral.borderLight,
+    backgroundColor: Colors.dark.surface,
+    padding: Spacing.md,
+    borderRadius: Radius.lg,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.neutral.border,
   },
   memberInfo: {
     flex: 1,
@@ -155,11 +190,12 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontSize: 16,
-    marginBottom: 2,
+    color: Colors.text.primary,
   },
   memberRole: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.text.muted,
+    marginTop: 2,
   },
   actionBtn: {
     padding: Spacing.xs,

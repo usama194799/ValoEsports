@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FlashList } from '@shopify/flash-list';
-import { StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { ROUTES } from '../navigation/routes';
 import { Tournament } from '../types';
-import { db } from '../data/db';
+import { tournamentService } from '../services';
 import SearchHeader from '../components/SearchHeader';
 import TournamentListCard from '../components/TournamentListCard';
 import EmptyState from '../components/EmptyState';
@@ -27,21 +27,39 @@ const SearchScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
 
   const handleBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
 
-  const searchResults = useMemo(() => {
-    if (!query.trim()) return [];
-    return db.tournaments.filter(
-      t =>
-        t.name.toLowerCase().includes(query.toLowerCase()) ||
-        t.gameName.toLowerCase().includes(query.toLowerCase()) ||
-        (t.organizer &&
-          t.organizer.toLowerCase().includes(query.toLowerCase())),
-    );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 400);
+    return () => clearTimeout(handler);
   }, [query]);
+
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      setTournaments([]);
+      return;
+    }
+    const fetchSearch = async () => {
+      setLoading(true);
+      try {
+        const results = await tournamentService.getTournaments({ search: debouncedQuery });
+        setTournaments(results);
+      } catch (e) {
+        console.error('Search failed', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSearch();
+  }, [debouncedQuery]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: Tournament; index: number }) => (
@@ -59,6 +77,13 @@ const SearchScreen: React.FC = () => {
   );
 
   const renderEmptySearch = () => {
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary.main} />
+        </View>
+      );
+    }
     if (query.trim()) {
       return (
         <EmptyState
@@ -97,22 +122,33 @@ const SearchScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Trending */}
+        {/* Trending Searches */}
         <View style={styles.section}>
-          <Heading style={styles.sectionTitle}>Trending Tournaments</Heading>
-          {TRENDING.map((item, i) => (
-            <TouchableOpacity
-              key={item}
-              style={styles.trendingRow}
-              onPress={() => setQuery(item)}
-            >
-              <View style={styles.trendingRank}>
-                <Label style={styles.trendingRankText}>{i + 1}</Label>
-              </View>
-              <Subheading style={styles.trendingName}>{item}</Subheading>
-              <Icon name="trending-up" size={18} color={Colors.primary.main} />
-            </TouchableOpacity>
-          ))}
+          <View style={styles.sectionHeader}>
+            <Heading style={styles.sectionTitle}>Trending Now</Heading>
+          </View>
+          <View style={styles.trendingList}>
+            {TRENDING.map((item, index) => (
+              <TouchableOpacity
+                key={item}
+                style={styles.trendingItem}
+                onPress={() => setQuery(item)}
+              >
+                <View style={styles.trendingRank}>
+                  <Label
+                    style={[
+                      styles.rankText,
+                      index < 3 && styles.topRankText,
+                    ]}
+                  >
+                    #{index + 1}
+                  </Label>
+                </View>
+                <Icon name="trending-up" size={16} color={Colors.primary.main} />
+                <Subheading style={styles.trendingLabel}>{item}</Subheading>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </ScrollView>
     );
@@ -120,34 +156,26 @@ const SearchScreen: React.FC = () => {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
-          <Icon name="arrow-left" size={24} color={Colors.text.primary} />
-        </TouchableOpacity>
-        <View style={styles.searchWrapper}>
-          <SearchHeader
-            autoFocus
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search game, organizer..."
-          />
-        </View>
-      </View>
-
-      {query.trim() && searchResults.length > 0 ? (
-        <View style={{ flex: 1 }}>
+      <SearchHeader
+        value={query}
+        onChangeText={setQuery}
+        autoFocus
+      />
+      <View style={styles.content}>
+        {query.trim() && !loading && tournaments.length > 0 ? (
           <FlashList
-            data={searchResults}
-            keyExtractor={item => item.id}
+            data={tournaments}
             renderItem={renderItem}
-            contentContainerStyle={styles.listContent}
-            keyboardDismissMode="on-drag"
             estimatedItemSize={120}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           />
-        </View>
-      ) : (
-        renderEmptySearch()
-      )}
+        ) : (
+          renderEmptySearch()
+        )}
+      </View>
     </View>
   );
 };
@@ -157,22 +185,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.dark.background,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: Spacing.md,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.neutral.borderLight,
-    paddingBottom: Spacing.sm,
-  },
-  backBtn: {
-    padding: Spacing.xs,
-  },
-  searchWrapper: {
+  content: {
     flex: 1,
   },
   listContent: {
     padding: Spacing.lg,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   idleState: {
     flex: 1,
@@ -188,10 +210,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
   },
   clearText: {
-    color: Colors.primary.main,
+    color: Colors.text.muted,
   },
   chipRow: {
     flexDirection: 'row',
@@ -203,39 +225,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.dark.surface,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
     borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: Colors.neutral.border,
-    gap: 6,
+    gap: Spacing.xs,
   },
   historyLabel: {
-    fontSize: 12,
+    color: Colors.text.secondary,
   },
-  trendingRow: {
+  trendingList: {
+    gap: Spacing.sm,
+  },
+  trendingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.neutral.borderLight,
+    backgroundColor: Colors.dark.surface,
+    padding: Spacing.md,
+    borderRadius: Radius.lg,
+    gap: Spacing.sm,
   },
   trendingRank: {
     width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.dark.surface,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.md,
   },
-  trendingRankText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  trendingName: {
-    flex: 1,
+  rankText: {
+    color: Colors.text.muted,
     fontSize: 14,
+  },
+  topRankText: {
+    color: Colors.primary.main,
+    fontWeight: 'bold',
+  },
+  trendingLabel: {
+    flex: 1,
+    color: Colors.text.primary,
   },
 });
 
-export default React.memo(SearchScreen);
+export default SearchScreen;

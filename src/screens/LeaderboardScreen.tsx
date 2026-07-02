@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -6,6 +6,8 @@ import {
   StatusBar,
   StyleSheet,
   View,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -24,9 +26,13 @@ import { playerService, userService } from '../services';
 import TopTeamsPodium from '../components/TopTeamsPodium';
 import LeaderboardListRow from '../components/LeaderboardListRow';
 import PlayerAvatar from '../components/PlayerAvatar';
-import { Heading, Label } from '../components/Typography';
+import { Heading, Label, Subheading } from '../components/Typography';
 import { Colors } from '../theme/colors';
 import { Spacing } from '../theme/spacing';
+import { Radius } from '../theme/radius';
+
+type Category = 'players' | 'teams';
+type Metric = 'ranking' | 'xp' | 'wins' | 'country';
 
 const LeaderboardScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -34,6 +40,9 @@ const LeaderboardScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderPlayer[]>([]);
+  
+  const [category, setCategory] = useState<Category>('teams');
+  const [metric, setMetric] = useState<Metric>('ranking');
 
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -41,12 +50,13 @@ const LeaderboardScreen: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [profileData, leaderboardData] = await Promise.all([
           userService.getProfile(),
-          playerService.getLeaderboard(),
+          playerService.getLeaderboard({ category, metric }),
         ]);
-        setProfile(profileData);
+        if (!profile) setProfile(profileData);
         setLeaderboard(leaderboardData);
       } catch (e) {
         console.error('Failed to load leaderboard data:', e);
@@ -55,7 +65,7 @@ const LeaderboardScreen: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [category, metric]);
 
   useEffect(() => {
     if (!loading) {
@@ -95,20 +105,45 @@ const LeaderboardScreen: React.FC = () => {
   }));
 
   const renderItem: ListRenderItem<LeaderPlayer> = useCallback(
-    ({ item }) => <LeaderboardListRow player={item} />,
-    [],
+    ({ item }) => <LeaderboardListRow player={item} metric={metric} />,
+    [metric],
   );
 
-  if (loading || !profile) {
-    return (
-      <View style={styles.loadingRoot}>
-        <ActivityIndicator size="large" color={Colors.primary.main} />
-      </View>
-    );
-  }
-
   const top3 = leaderboard.slice(0, 3);
-  const remainingPlayers = leaderboard.slice(0); // We display all in the list per Figma? Wait, Figma shows 1, 2, 3, 4 in the list.
+  const remainingPlayers = leaderboard.slice(0);
+
+  const renderFilters = () => (
+    <View style={styles.filtersContainer}>
+      <View style={styles.categoryToggle}>
+        <TouchableOpacity
+          style={[styles.categoryBtn, category === 'players' && styles.categoryBtnActive]}
+          onPress={() => setCategory('players')}
+        >
+          <Label style={[styles.categoryBtnText, category === 'players' && styles.categoryBtnTextActive]}>Top Players</Label>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.categoryBtn, category === 'teams' && styles.categoryBtnActive]}
+          onPress={() => setCategory('teams')}
+        >
+          <Label style={[styles.categoryBtnText, category === 'teams' && styles.categoryBtnTextActive]}>Top Teams</Label>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricsScroll} contentContainerStyle={styles.metricsContent}>
+        {(['ranking', 'xp', 'wins', 'country'] as Metric[]).map(m => (
+          <TouchableOpacity
+            key={m}
+            style={[styles.metricChip, metric === m && styles.metricChipActive]}
+            onPress={() => setMetric(m)}
+          >
+            <Label style={[styles.metricChipText, metric === m && styles.metricChipTextActive]}>
+              {m === 'ranking' ? 'Ranking' : m === 'xp' ? 'XP' : m === 'wins' ? 'Wins' : 'Country Ranking'}
+            </Label>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
     <View style={styles.root}>
@@ -118,7 +153,6 @@ const LeaderboardScreen: React.FC = () => {
         translucent={false}
       />
 
-      {/* Sticky Header */}
       <Animated.View
         style={[
           styles.headerWrapper,
@@ -128,7 +162,7 @@ const LeaderboardScreen: React.FC = () => {
       >
         <View style={styles.headerContainer}>
           <PlayerAvatar
-            uri={profile.avatar}
+            uri={profile?.avatar || ''}
             size={40}
             borderWidth={2}
             borderColor="#3A82F6"
@@ -149,19 +183,31 @@ const LeaderboardScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 90 },
+          { paddingTop: insets.top + 70 },
         ]}
         style={fadeStyle}
         ListHeaderComponent={
           <>
-            <TopTeamsPodium topPlayers={top3} />
-            {/* List Column Headers */}
-            <View style={styles.listHeaders}>
-              <Label style={styles.listHeaderLeft}>Rank</Label>
-              <Label style={styles.listHeaderCenter}>Teams</Label>
-              <Label style={styles.listHeaderRight}>M</Label>
-              <Label style={styles.listHeaderFarRight}>Rating</Label>
-            </View>
+            {renderFilters()}
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.primary.main} />
+              </View>
+            ) : (
+              <>
+                <TopTeamsPodium topPlayers={top3} category={category} metric={metric} />
+                <View style={styles.listHeaders}>
+                  <Label style={styles.listHeaderLeft}>Rank</Label>
+                  <Label style={styles.listHeaderCenter}>{category === 'players' ? 'Players' : 'Teams'}</Label>
+                  <Label style={styles.listHeaderRight}>
+                    {metric === 'xp' ? 'Lvl' : metric === 'wins' ? 'W' : 'M'}
+                  </Label>
+                  <Label style={styles.listHeaderFarRight}>
+                    {metric === 'xp' ? 'XP' : metric === 'wins' ? 'Wins' : metric === 'country' ? 'Country' : 'Rating'}
+                  </Label>
+                </View>
+              </>
+            )}
           </>
         }
         ListFooterComponent={<View style={styles.bottomSpacer} />}
@@ -175,9 +221,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.dark.background,
   },
-  loadingRoot: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
+  loadingContainer: {
+    marginTop: Spacing.xxl,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -208,6 +253,58 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: Spacing.lg,
   },
+  filtersContainer: {
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  categoryToggle: {
+    flexDirection: 'row',
+    backgroundColor: Colors.dark.cardAlt,
+    borderRadius: Radius.full,
+    padding: 4,
+    marginBottom: Spacing.md,
+  },
+  categoryBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: Radius.full,
+  },
+  categoryBtnActive: {
+    backgroundColor: Colors.primary.main,
+  },
+  categoryBtnText: {
+    color: Colors.text.secondary,
+    fontWeight: '600',
+  },
+  categoryBtnTextActive: {
+    color: '#FFF',
+  },
+  metricsScroll: {
+    flexGrow: 0,
+  },
+  metricsContent: {
+    gap: Spacing.sm,
+    paddingBottom: Spacing.sm,
+  },
+  metricChip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.dark.cardAlt,
+    borderWidth: 1,
+    borderColor: Colors.neutral.borderLight,
+  },
+  metricChipActive: {
+    borderColor: Colors.primary.main,
+    backgroundColor: Colors.primary.main + '20',
+  },
+  metricChipText: {
+    color: Colors.text.secondary,
+  },
+  metricChipTextActive: {
+    color: Colors.primary.main,
+  },
   listHeaders: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -227,7 +324,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   listHeaderFarRight: {
-    width: 50,
+    width: 70,
     textAlign: 'center',
   },
   bottomSpacer: {
